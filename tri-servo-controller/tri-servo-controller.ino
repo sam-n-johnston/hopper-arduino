@@ -12,10 +12,20 @@ void setup() {
   servo3.begin();
 }
 
+int lastSecond = 0;
+int loops = 0;
 
 void loop() {
-  // int pos = servo2.getCurrentPosition();
-  // Serial.println(pos);
+  loops++;
+  long int currTime = millis();
+
+  if (lastSecond + 1000 < currTime) {
+    lastSecond = currTime;
+    Serial.print("Current hz: ");
+    Serial.println(loops);
+    loops = 0;
+  }
+
   long int time = millis();
   float theta1;
   float theta2;
