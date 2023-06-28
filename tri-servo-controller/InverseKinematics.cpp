@@ -1,16 +1,15 @@
 #include "InverseKinematics.h"
 
 // Taken from https://hypertriangle.com/~alex/delta-robot-tutorial/
-// robot geometry
-// (look at pics above for explanation)
-const float e = 115.0;     // end effector
-const float f = 457.3;     // base
-const float re = 232.0;
-const float rf = 112.0;
+// robot geometry (look at pics in link above for explanation)
+const float e = 27.696;     // end effector triangle side length
+const float f = 124.0;     // base triangle side length
+const float re = 100.0;    // tibia length
+const float rf = 60.2;    // femur length
 
 // trigonometric constants
 const float sqrt3 = sqrt(3.0);
-const float pi = 3.141592653;    // PI
+const float pi = 3.141592653;
 const float sin120 = sqrt3/2.0;
 const float cos120 = -0.5;
 const float tan60 = sqrt3;
