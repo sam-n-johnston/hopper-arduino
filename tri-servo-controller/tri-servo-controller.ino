@@ -1,4 +1,5 @@
 #include "Servo.h"
+#include "InverseKinematics.h"
 
 Servo servo1 = Servo(11, 10, 4, 611, true);
 Servo servo2 = Servo(6, 9, 2, 2315, false);
@@ -10,6 +11,7 @@ void setup() {
   servo2.begin();
   servo3.begin();
 }
+
 
 void loop() {
   int pos = servo2.getCurrentPosition();
