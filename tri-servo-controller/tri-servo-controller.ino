@@ -22,8 +22,8 @@ void loop() {
     servo2.setPositionInDeg(0);
     servo3.setPositionInDeg(0);
   } else {
-    servo1.setPositionInDeg(100);
-    servo2.setPositionInDeg(100);
-    servo3.setPositionInDeg(100);
+    servo1.setPositionInDeg(45);
+    servo2.setPositionInDeg(45);
+    servo3.setPositionInDeg(45);
   }
 }

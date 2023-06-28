@@ -56,12 +56,12 @@ int Servo::getCurrentPosition()
         ? (this->currentTurn * 4096 + encoderAngle) - zeroPosition
         : zeroPosition - (this->currentTurn * 4096 + encoderAngle);
 
-    return result;
+    return result * 360.0 / 4096.0;
 }
 
 float Servo::getPIDOutput(float error)
 {
-    float kp = .5; // Pc ~140?
+    float kp = 3.; // Pc ~140?
     float kd = 0.0;
     float ki = 0.0;
 
