@@ -2,7 +2,10 @@
 
 ## Test bed controller
 
-This piece runs on 1 arduino that is connected to all 3 DC motors & 3 position sensors (AS5600). Together, they constitute 3 servo motors. It'll log the loop frequency and can be used to test the maximum capacity of the robot's legs. 
+This piece runs on 1 arduino that is connected to all 3 DC motors & 3 position sensors (AS5600). Together, they constitute 3 servo motors that control the leg's position. It'll log the loop frequency and can be used to test the maximum capacity of the robot's legs. The robot is placed upside down and it's foot can be weighted to simulate landings or jumping.
+
+![PXL_20231019_214050373](https://github.com/sam-n-johnston/hopper-arduino/assets/17952091/71fa3a4c-1425-4bef-8040-db1f5a0d1ad2)
+
 
 ### Connections
 
