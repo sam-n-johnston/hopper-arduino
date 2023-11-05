@@ -2,34 +2,42 @@
 #define TCAADDR 0x70
 
 void tcaselect(uint8_t i) {
-  if (i > 7) return;
- 
-  Wire.beginTransmission(TCAADDR);
-  Wire.write(1 << i);
-  Wire.endTransmission();  
+    if (i > 7)
+        return;
+
+    Wire.beginTransmission(TCAADDR);
+    Wire.write(1 << i);
+    Wire.endTransmission();
 }
 
 Servo::Servo(
-    uint8_t clockWiseDirectionPin,
-    uint8_t counterClockWiseDirectionPin,
+    uint8_t PWM1,
+    uint8_t PWM2,
+    uint8_t OCM,
+    uint8_t DIAG,
+    uint8_t EN,
     uint8_t as5600Pin,
     int zeroPosition,
-    bool direction
-) {
-  this->clockWiseDirectionPin = clockWiseDirectionPin;
-  this->counterClockWiseDirectionPin = counterClockWiseDirectionPin;
-  this->as5600Pin = as5600Pin;
-  this->zeroPosition = zeroPosition;
-  this->direction = direction;
+    bool direction) {
+    this->PWM1 = PWM1;
+    this->PWM2 = PWM2;
+    this->OCM = OCM;
+    this->DIAG = DIAG;
+    this->EN = EN;
+    this->as5600Pin = as5600Pin;
+    this->zeroPosition = zeroPosition;
+    this->direction = direction;
 }
 
-void Servo::begin()
-{
+void Servo::begin() {
     // Setup gear motor
-    pinMode(this->clockWiseDirectionPin, OUTPUT);
-    pinMode(this->counterClockWiseDirectionPin, OUTPUT);
-    digitalWrite(this->clockWiseDirectionPin, LOW);
-    digitalWrite(this->counterClockWiseDirectionPin, LOW);
+    pinMode(this->PWM1, OUTPUT);
+    pinMode(this->PWM2, OUTPUT);
+    pinMode(this->OCM, INPUT);
+    pinMode(this->DIAG, INPUT);
+    pinMode(this->EN, OUTPUT);
+    digitalWrite(this->PWM1, LOW);
+    digitalWrite(this->PWM2, LOW);
 
     tcaselect(this->as5600Pin);
     // Setup encoder
@@ -37,10 +45,12 @@ void Servo::begin()
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
     int b = as5600.isConnected();
+
+    if (as5600.readAngle() > this->zeroPosition)
+        this->currentTurn--;
 };
 
-int Servo::getCurrentPosition()
-{
+int Servo::getCurrentPosition() {
     tcaselect(this->as5600Pin);
     int encoderAngle = as5600.readAngle();
 
@@ -53,15 +63,14 @@ int Servo::getCurrentPosition()
 
     this->previousPosition = encoderAngle;
     int result = direction
-        ? (this->currentTurn * 4096 + encoderAngle) - zeroPosition
-        : zeroPosition - (this->currentTurn * 4096 + encoderAngle);
+                     ? (this->currentTurn * 4096 + encoderAngle) - zeroPosition
+                     : zeroPosition - (this->currentTurn * 4096 + encoderAngle);
 
     return result * 360.0 / 4096.0;
 }
 
-float Servo::getPIDOutput(float error)
-{
-    float kp = 3.; // Pc ~140?
+float Servo::getPIDOutput(float error) {
+    float kp = 5.75; // Pc ~140?
     float kd = 0.0;
     float ki = 0.0;
 
@@ -72,8 +81,11 @@ float Servo::getPIDOutput(float error)
     return output;
 }
 
-void Servo::setPositionInDeg(float desiredPosition)
-{
+void Servo::setPositionInDeg(float desiredPosition) {
+    // Protect robot
+    if (desiredPosition > -5.0 || desiredPosition < -130.0)
+        desiredPosition = -30;
+
     this->deltaTime = millis() - previousPositionTime;
     int currentPosition = this->getCurrentPosition();
 
@@ -88,10 +100,9 @@ void Servo::setPositionInDeg(float desiredPosition)
     this->previousError = error;
 };
 
-void Servo::setMotorTorque(float speed)
-{
+void Servo::setMotorTorque(float speed) {
     // The level at which the motor starts moving
-    float zeroSpeed = 0.12 / 5.0 * 255.0;
+    float zeroSpeed = 0.0 / 5.0 * 255.0;
     float maxSpeed = 255.0;
 
     float adjustedSpeed = speed == 0 ? 0.0 : abs(speed) + zeroSpeed;
@@ -99,20 +110,19 @@ void Servo::setMotorTorque(float speed)
     if (adjustedSpeed > maxSpeed)
         adjustedSpeed = maxSpeed;
 
-
-      // analogWrite(this->counterClockWiseDirectionPin, 0);
-      // analogWrite(this->clockWiseDirectionPin, 0);
-      if (speed > 0) {
-          analogWrite(this->counterClockWiseDirectionPin, round(adjustedSpeed));
-          analogWrite(this->clockWiseDirectionPin, 0);
-      } else {
-          analogWrite(this->counterClockWiseDirectionPin, 0);
-          analogWrite(this->clockWiseDirectionPin, round(adjustedSpeed));
-      }
+    if (speed > 0) {
+        digitalWrite(this->EN, 1);
+        analogWrite(this->PWM1, 0);
+        analogWrite(this->PWM2, round(adjustedSpeed));
+    } else {
+        digitalWrite(this->EN, 1);
+        analogWrite(this->PWM1, round(adjustedSpeed));
+        analogWrite(this->PWM2, 0);
+    }
 }
 
-void Servo::torqueOff()
-{
-    digitalWrite(this->counterClockWiseDirectionPin, LOW);
-    digitalWrite(this->clockWiseDirectionPin, LOW);
+void Servo::torqueOff() {
+    digitalWrite(this->PWM1, LOW);
+    digitalWrite(this->PWM2, LOW);
+    digitalWrite(this->EN, LOW);
 }

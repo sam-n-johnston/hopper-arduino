@@ -10,12 +10,11 @@ This piece runs on 1 arduino that is connected to all 3 DC motors & 3 position s
 
 For the test bed, only the servos are connected:
 
-| Connections | PWM1 pin | PWM2 pin | AS5600 chip select pin on TCA9548A |
-|-------------|----------|----------|------------------------------------|
-| Servo 1     | 11       | 10       | 2                                  |
-| Servo 2     | 6        | 9        | 6                                  |
-| Servo 3     | 3        | 5        | 4                                  |
-
-
-
-
+| Connections                        | Servo 1 | Servo 2 | Servo 3 |
+|------------------------------------|---------|---------|---------|
+| PWM1                               | 11      | 9       | 5       |
+| PWM2                               | 10      | 6       | 3       |
+| OCM                                | A0      | A1      | A2      |
+| DIAG                               | 8       | 4       | A3      |
+| EN                                 | 7       | 2       | 12      |
+| AS5600 chip select pin on TCA9548A | 2       | 4       | 6       |

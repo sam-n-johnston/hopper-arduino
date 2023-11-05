@@ -1,21 +1,22 @@
 #ifndef SERVO_H
 #define SERVO_H
 
-#include <stdint.h>
 #include "AS5600.h"
 #include "Wire.h"
+#include <stdint.h>
 
-class IServo
-{
+class IServo {
 public:
     virtual void setPositionInDeg(float deg){};
 };
 
-class Servo : public IServo
-{
+class Servo : public IServo {
 private:
-    uint8_t clockWiseDirectionPin;
-    uint8_t counterClockWiseDirectionPin;
+    uint8_t PWM1;
+    uint8_t PWM2;
+    uint8_t OCM;
+    uint8_t DIAG;
+    uint8_t EN;
     uint8_t as5600Pin;
     int zeroPosition = 0;
     bool direction;
@@ -32,12 +33,14 @@ private:
 
 public:
     Servo(
-        uint8_t clockWiseDirectionPin,
-        uint8_t counterClockWiseDirectionPin,
+        uint8_t PWM1,
+        uint8_t PWM2,
+        uint8_t OCM,
+        uint8_t DIAG,
+        uint8_t EN,
         uint8_t as5600Pin,
         int zeroPosition,
-        bool direction
-    );
+        bool direction);
 
     void begin();
     void setPositionInDeg(float deg);
