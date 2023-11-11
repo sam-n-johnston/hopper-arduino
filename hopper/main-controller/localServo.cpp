@@ -30,6 +30,7 @@ LocalServo::LocalServo(
 }
 
 void LocalServo::begin() {
+    Serial.println("starting local servo");
     // Setup gear motor
     pinMode(this->PWM1, OUTPUT);
     pinMode(this->PWM2, OUTPUT);
@@ -39,13 +40,21 @@ void LocalServo::begin() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
 
+    Serial.println("got b1");
+
     if (this->as5600MultiplexerPin >= 0)
         tcaselect(this->as5600MultiplexerPin);
+
+    Serial.println("got b2");
+
     // Setup encoder
     as5600.begin(4);                        //  set direction pin.
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
     int b = as5600.isConnected();
+
+    Serial.print("got b: ");
+    Serial.println(b);
 
     if (as5600.readAngle() > this->zeroPosition)
         this->currentTurn--;
@@ -54,7 +63,11 @@ void LocalServo::begin() {
 int LocalServo::getCurrentPosition() {
     if (this->as5600MultiplexerPin >= 0)
         tcaselect(this->as5600MultiplexerPin);
+
     int encoderAngle = as5600.readAngle();
+
+    // Serial.print("got encoder angle: ");
+    // Serial.println(encoderAngle);
 
     // Check if there was a turn
     if (this->previousPosition > 4000 && encoderAngle < 100)
@@ -127,4 +140,10 @@ void LocalServo::torqueOff() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
     digitalWrite(this->EN, LOW);
+}
+
+void LocalServo::torqueOn() {
+    digitalWrite(this->PWM1, LOW);
+    digitalWrite(this->PWM2, LOW);
+    digitalWrite(this->EN, HIGH);
 }

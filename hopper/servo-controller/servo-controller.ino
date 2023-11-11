@@ -24,7 +24,7 @@
 const int SER2_PWM1 = 9, SER2_PWM2 = 6, SER2_OCM = A1, SER2_DIAG = 4,
           SER2_EN = 2, SER2_AS5600 = 4;
 const int SER3_PWM1 = 5, SER3_PWM2 = 3, SER3_OCM = A2, SER3_DIAG = A3,
-          SER3_EN = 12, SER3_AS5600 = 6;
+          SER3_EN = A0, SER3_AS5600 = 6;
 
 Servo servo2 = Servo(
     SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_AS5600, 930, true);
@@ -77,8 +77,8 @@ void setup() {
     sendingPosition = false;
 
     // TODO: MISO should be floating when CS is high
-    pinMode(
-        MISO, OUTPUT); // Sets MISO as OUTPUT (Have to Send data to Master IN
+    // Sets MISO as OUTPUT (Have to Send data to Master IN
+    pinMode(MISO, OUTPUT);
     pinMode(chipSelectPin, INPUT);
     SPCR |= _BV(SPE); // Turn on SPI in Slave Mode
 
@@ -172,17 +172,23 @@ void loop() {
         }
     }
 
+    // int pos = servo2.getCurrentPosition();
+    // Serial.print("currentGoalPosition2: ");
+    // Serial.println(currentGoalPosition2);
+
+    // servo3.setPositionInDeg(-30.0);
+
     if (torqueOn2)
         servo2.setPositionInDeg(currentGoalPosition2);
     else {
-        servo2.getCurrentPosition();
+        // servo2.getCurrentPosition();
         servo2.torqueOff();
     }
 
     if (torqueOn3)
         servo3.setPositionInDeg(currentGoalPosition3);
     else {
-        servo3.getCurrentPosition();
+        // servo3.getCurrentPosition();
         servo3.torqueOff();
     }
 

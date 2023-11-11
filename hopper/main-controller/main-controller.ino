@@ -7,7 +7,7 @@ const int SER1_PWM1 = 3, SER1_PWM2 = 5, SER1_OCM = A0, SER1_DIAG = 7,
           SER1_EN = 8, SER1_AS5600_MULTIPLEXER_PIN = -1;
 const int SER2_AND_3_CHIP_SELECT_PIN = 10;
 
-IServo servo1 = LocalServo(
+LocalServo servo1 = LocalServo(
     SER1_PWM1,
     SER1_PWM2,
     SER1_OCM,
@@ -16,24 +16,26 @@ IServo servo1 = LocalServo(
     SER1_AS5600_MULTIPLEXER_PIN,
     1360,
     true);
-IServo servo2 = SPIServo(
+SPIServo servo2 = SPIServo(
     SER2_AND_3_CHIP_SELECT_PIN,
     QUERY_GET_POSITION2,
     COMMAND_SET_GOAL_POSITION2,
     TORQUE_OFF2,
     TORQUE_ON2);
-IServo servo3 = SPIServo(
+SPIServo servo3 = SPIServo(
     SER2_AND_3_CHIP_SELECT_PIN,
     QUERY_GET_POSITION3,
     COMMAND_SET_GOAL_POSITION3,
     TORQUE_OFF3,
     TORQUE_ON3);
 
-Leg leg = Leg(servo1, servo2, servo3);
+Leg leg = Leg(&servo1, &servo2, &servo3);
 
 void setup() {
     Serial.begin(115200);
+    Serial.println("Setup Done");
     leg.begin();
+    leg.torqueOn();
 }
 
 int lastSecond = 0;
@@ -58,10 +60,5 @@ void loop() {
 
     float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
 
-    int status = delta_calcInverse(
-        0, 0, static_cast<int>(zValue), theta1, theta2, theta3);
-
-    servo1.setPositionInDeg(-theta1);
-    servo2.setPositionInDeg(-theta2);
-    servo3.setPositionInDeg(-theta3);
+    leg.setPosition(0, 0, zValue);
 }

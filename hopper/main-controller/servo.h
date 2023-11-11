@@ -7,11 +7,11 @@
 
 class IServo {
 public:
-    virtual void begin(){};
-    virtual void setPositionInDeg(float deg){};
-    virtual void torqueOn(){};
-    virtual void torqueOff(){};
-    virtual int getCurrentPosition(){};
+    virtual void begin() = 0;
+    virtual void setPositionInDeg(float deg) = 0;
+    virtual void torqueOn() = 0;
+    virtual void torqueOff() = 0;
+    virtual int getCurrentPosition() = 0;
 };
 
 #endif

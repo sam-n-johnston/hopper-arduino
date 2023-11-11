@@ -6,14 +6,14 @@
 #include <SPI.h>
 #include <stdint.h>
 
-#define COMMAND_SET_GOAL_POSITION2 0
-#define COMMAND_SET_GOAL_POSITION3 1
-#define QUERY_GET_POSITION2 2
-#define QUERY_GET_POSITION3 3
-#define TORQUE_OFF2 4
-#define TORQUE_OFF3 5
-#define TORQUE_ON2 6
-#define TORQUE_ON3 7
+#define COMMAND_SET_GOAL_POSITION2 0x00
+#define COMMAND_SET_GOAL_POSITION3 0x01
+#define QUERY_GET_POSITION2 0x02
+#define QUERY_GET_POSITION3 0x03
+#define TORQUE_OFF2 0x04
+#define TORQUE_OFF3 0x05
+#define TORQUE_ON2 0x06
+#define TORQUE_ON3 0x07
 
 class SPIServo : public IServo {
 private:

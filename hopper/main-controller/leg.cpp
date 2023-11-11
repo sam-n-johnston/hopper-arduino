@@ -1,16 +1,16 @@
 #include "leg.h"
 #include "InverseKinematics.h"
 
-Leg::Leg(IServo servo1, IServo servo2, IServo servo3) {
+Leg::Leg(IServo *servo1, IServo *servo2, IServo *servo3) {
     this->servo1 = servo1;
     this->servo2 = servo2;
     this->servo3 = servo3;
 }
 
 void Leg::begin() {
-    this->servo1.begin();
-    this->servo2.begin();
-    this->servo3.begin();
+    this->servo1->begin();
+    this->servo2->begin();
+    this->servo3->begin();
 }
 
 void Leg::setPosition(float x, float y, float z) {
@@ -26,9 +26,9 @@ void Leg::setPosition(float x, float y, float z) {
         theta2,
         theta3);
 
-    this->servo1.setPositionInDeg(-theta1);
-    this->servo2.setPositionInDeg(-theta2);
-    this->servo3.setPositionInDeg(-theta3);
+    this->servo1->setPositionInDeg(-theta1);
+    this->servo2->setPositionInDeg(-theta2);
+    this->servo3->setPositionInDeg(-theta3);
 }
 
 bool Leg::isFootTouchingGround() {
@@ -45,13 +45,13 @@ bool Leg::isFootTouchingGround() {
 }
 
 void Leg::torqueOff() {
-    this->servo1.torqueOff();
-    this->servo2.torqueOff();
-    this->servo3.torqueOff();
+    this->servo1->torqueOff();
+    this->servo2->torqueOff();
+    this->servo3->torqueOff();
 }
 
 void Leg::torqueOn() {
-    this->servo1.torqueOn();
-    this->servo2.torqueOn();
-    this->servo3.torqueOn();
+    this->servo1->torqueOn();
+    this->servo2->torqueOn();
+    this->servo3->torqueOn();
 }
