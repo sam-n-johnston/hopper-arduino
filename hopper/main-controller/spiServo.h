@@ -2,8 +2,8 @@
 #define SPI_SERVO_H
 
 #include "AS5600.h"
-#include "Wire.h"
 #include "servo.h"
+#include <SPI.h>
 #include <stdint.h>
 
 #define COMMAND_SET_GOAL_POSITION2 0

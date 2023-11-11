@@ -13,7 +13,7 @@ private:
     uint8_t OCM;
     uint8_t DIAG;
     uint8_t EN;
-    uint8_t as5600Pin;
+    uint8_t as5600MultiplexerPin;
     int zeroPosition = 0;
     bool direction;
     int previousPosition = 0;
@@ -28,13 +28,13 @@ private:
     float getPIDOutput(float error);
 
 public:
-    Servo(
+    LocalServo(
         uint8_t PWM1,
         uint8_t PWM2,
         uint8_t OCM,
         uint8_t DIAG,
         uint8_t EN,
-        uint8_t as5600Pin,
+        uint8_t as5600MultiplexerPin,
         int zeroPosition,
         bool direction);
 

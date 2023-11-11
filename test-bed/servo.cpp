@@ -16,7 +16,7 @@ Servo::Servo(
     uint8_t OCM,
     uint8_t DIAG,
     uint8_t EN,
-    uint8_t as5600Pin,
+    uint8_t as5600MultiplexerPin,
     int zeroPosition,
     bool direction) {
     this->PWM1 = PWM1;
@@ -24,7 +24,7 @@ Servo::Servo(
     this->OCM = OCM;
     this->DIAG = DIAG;
     this->EN = EN;
-    this->as5600Pin = as5600Pin;
+    this->as5600MultiplexerPin = as5600MultiplexerPin;
     this->zeroPosition = zeroPosition;
     this->direction = direction;
 }
@@ -39,7 +39,7 @@ void Servo::begin() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
 
-    tcaselect(this->as5600Pin);
+    tcaselect(this->as5600MultiplexerPin);
     // Setup encoder
     as5600.begin(4);                        //  set direction pin.
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
@@ -51,7 +51,7 @@ void Servo::begin() {
 };
 
 int Servo::getCurrentPosition() {
-    tcaselect(this->as5600Pin);
+    tcaselect(this->as5600MultiplexerPin);
     int encoderAngle = as5600.readAngle();
 
     // Check if there was a turn

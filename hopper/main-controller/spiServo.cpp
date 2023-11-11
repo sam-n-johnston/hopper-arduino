@@ -3,14 +3,18 @@
 SPIServo::SPIServo(
     uint8_t chipSelectPin,
     uint8_t getPositionQuery,
-    uint8_t setPositionCommand) {
+    uint8_t setPositionCommand,
+    uint8_t torqueOffCommand,
+    uint8_t torqueOnCommand) {
     this->chipSelectPin = chipSelectPin;
     this->getPositionQuery = getPositionQuery;
     this->setPositionCommand = setPositionCommand;
+    this->torqueOffCommand = torqueOffCommand;
+    this->torqueOnCommand = torqueOnCommand;
 }
 
 void SPIServo::begin() {
-    DEBUG_SERIAL.println("Setting up servos...");
+    Serial.println("Setting up servos...");
     pinMode(this->chipSelectPin, OUTPUT);
     digitalWrite(this->chipSelectPin, HIGH);
 
@@ -42,7 +46,7 @@ void SPIServo::setPositionInDeg(float desiredPosition) {
     if (data > -5 || data < -130)
         data = -30;
 
-    digitalWrite(this->chipSelectPIn, LOW);
+    digitalWrite(this->chipSelectPin, LOW);
 
     byte m_receive1 = SPI.transfer(this->setPositionCommand);
 
@@ -55,7 +59,7 @@ void SPIServo::setPositionInDeg(float desiredPosition) {
     byte m_receive3 = SPI.transfer(secondByte);
     delayMicroseconds(75);
 
-    digitalWrite(this->chipSelectPIn, HIGH);
+    digitalWrite(this->chipSelectPin, HIGH);
 };
 
 void SPIServo::torqueOn() {

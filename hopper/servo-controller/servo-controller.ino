@@ -43,7 +43,9 @@ Servo servo3 = Servo(
 #define QUERY_GET_POSITION2 2
 #define QUERY_GET_POSITION3 3
 #define TORQUE_OFF2 4
-#define TORQUE_ON3 5
+#define TORQUE_OFF3 5
+#define TORQUE_ON2 6
+#define TORQUE_ON3 7
 
 // Change to int when testing 2 bytes.
 byte goalPosition = 0;
@@ -65,8 +67,7 @@ int currentGoalPosition3 = 0;
 bool torqueOn2 = false;
 bool torqueOn3 = false;
 
-void setup()
-{
+void setup() {
     Serial.begin(115200);
     servo2.begin();
     servo3.begin();
@@ -76,7 +77,8 @@ void setup()
     sendingPosition = false;
 
     // TODO: MISO should be floating when CS is high
-    pinMode(MISO, OUTPUT); // Sets MISO as OUTPUT (Have to Send data to Master IN
+    pinMode(
+        MISO, OUTPUT); // Sets MISO as OUTPUT (Have to Send data to Master IN
     pinMode(chipSelectPin, INPUT);
     SPCR |= _BV(SPE); // Turn on SPI in Slave Mode
 
@@ -85,55 +87,47 @@ void setup()
 }
 
 // TODO: When CS goes high, clear out all information of the GET.
-
 ISR(SPI_STC_vect) // Interrupt routine function
 {
     byte data = SPDR; // grab byte from SPI Data Register
 
     // Transmission done, cleaning up
-    if (replyPosition == 2)
-    {
+    if (replyPosition == 2) {
         replyPosition = 0;
         sendingPosition = false;
         return;
     }
 
-    if (replyPosition == 1)
-    {
+    if (replyPosition == 1) {
         byte secondByte = currentPositionThatIsBeingSent;
         SPDR = secondByte;
         replyPosition++;
         return;
     }
 
-    if (data == QUERY_GET_POSITION2 || data == QUERY_GET_POSITION3)
-    {
+    if (data == QUERY_GET_POSITION2 || data == QUERY_GET_POSITION3) {
         request = data;
         sendingPosition = true;
         readyToProcessData = true;
         return;
     }
 
-    if (pos == 0 && data == TORQUE_OFF2)
-    {
+    if (pos == 0 && data == TORQUE_OFF2) {
         torqueOn2 = false;
         return;
     }
 
-    if (pos == 0 && data == TORQUE_OFF3)
-    {
+    if (pos == 0 && data == TORQUE_OFF3) {
         torqueOn3 = false;
         return;
     }
 
-    if (pos == 0 && data == TORQUE_ON2)
-    {
+    if (pos == 0 && data == TORQUE_ON2) {
         torqueOn2 = true;
         return;
     }
 
-    if (pos == 0 && data == TORQUE_ON3)
-    {
+    if (pos == 0 && data == TORQUE_ON3) {
         torqueOn3 = true;
         return;
     }
@@ -149,22 +143,19 @@ ISR(SPI_STC_vect) // Interrupt routine function
         readyToProcessData = true;
 }
 
-void loop()
-{
-    if (readyToProcessData)
-    {
+void loop() {
+    if (readyToProcessData) {
         pos = 0;
         readyToProcessData = false;
         if (!sendingPosition && request == COMMAND_SET_GOAL_POSITION2)
             currentGoalPosition2 = (bytes[1] << 8) | bytes[2];
         else if (!sendingPosition && request == COMMAND_SET_GOAL_POSITION3)
             currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
-        else
-        {
+        else {
             // Set current position in memory
             if (request == QUERY_GET_POSITION2)
                 currentPositionThatIsBeingSent = servo2.getCurrentPosition();
-            else 
+            else
                 currentPositionThatIsBeingSent = servo3.getCurrentPosition();
 
             // Prepare first byte
@@ -174,27 +165,23 @@ void loop()
         }
     }
 
-    if (digitalRead(chipSelectPin) == HIGH)
-    {
-        if (pos > 0)
-        {
+    if (digitalRead(chipSelectPin) == HIGH) {
+        if (pos > 0) {
             Serial.println("Failed to process message");
             pos = 0;
         }
     }
 
     if (torqueOn2)
-        servo2.setPositionInDeg(currentGoalPosition);
-    else
-    {
+        servo2.setPositionInDeg(currentGoalPosition2);
+    else {
         servo2.getCurrentPosition();
         servo2.torqueOff();
     }
 
     if (torqueOn3)
-        servo3.setPositionInDeg(currentGoalPosition);
-    else
-    {
+        servo3.setPositionInDeg(currentGoalPosition3);
+    else {
         servo3.getCurrentPosition();
         servo3.torqueOff();
     }

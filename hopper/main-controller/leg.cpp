@@ -35,8 +35,8 @@ bool Leg::isFootTouchingGround() {
     int sensorPin = A0;
     int sensorValue = analogRead(sensorPin);
 
-    // DEBUG_SERIAL.print("Sensor value: ");
-    // DEBUG_SERIAL.println(sensorValue);
+    // Serial.print("Sensor value: ");
+    // Serial.println(sensorValue);
 
     if (sensorValue > 350)
         return true;

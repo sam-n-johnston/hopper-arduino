@@ -10,13 +10,13 @@ void tcaselect(uint8_t i) {
     Wire.endTransmission();
 }
 
-Servo::Servo(
+LocalServo::LocalServo(
     uint8_t PWM1,
     uint8_t PWM2,
     uint8_t OCM,
     uint8_t DIAG,
     uint8_t EN,
-    uint8_t as5600Pin,
+    uint8_t as5600MultiplexerPin,
     int zeroPosition,
     bool direction) {
     this->PWM1 = PWM1;
@@ -24,12 +24,12 @@ Servo::Servo(
     this->OCM = OCM;
     this->DIAG = DIAG;
     this->EN = EN;
-    this->as5600Pin = as5600Pin;
+    this->as5600MultiplexerPin = as5600MultiplexerPin;
     this->zeroPosition = zeroPosition;
     this->direction = direction;
 }
 
-void Servo::begin() {
+void LocalServo::begin() {
     // Setup gear motor
     pinMode(this->PWM1, OUTPUT);
     pinMode(this->PWM2, OUTPUT);
@@ -39,7 +39,8 @@ void Servo::begin() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
 
-    tcaselect(this->as5600Pin);
+    if (this->as5600MultiplexerPin >= 0)
+        tcaselect(this->as5600MultiplexerPin);
     // Setup encoder
     as5600.begin(4);                        //  set direction pin.
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
@@ -50,8 +51,9 @@ void Servo::begin() {
         this->currentTurn--;
 };
 
-int Servo::getCurrentPosition() {
-    tcaselect(this->as5600Pin);
+int LocalServo::getCurrentPosition() {
+    if (this->as5600MultiplexerPin >= 0)
+        tcaselect(this->as5600MultiplexerPin);
     int encoderAngle = as5600.readAngle();
 
     // Check if there was a turn
@@ -69,7 +71,7 @@ int Servo::getCurrentPosition() {
     return result * 360.0 / 4096.0;
 }
 
-float Servo::getPIDOutput(float error) {
+float LocalServo::getPIDOutput(float error) {
     float kp = 5.75; // Pc ~140?
     float kd = 0.0;
     float ki = 0.0;
@@ -81,7 +83,7 @@ float Servo::getPIDOutput(float error) {
     return output;
 }
 
-void Servo::setPositionInDeg(float desiredPosition) {
+void LocalServo::setPositionInDeg(float desiredPosition) {
     // Protect robot
     if (desiredPosition > -5.0 || desiredPosition < -130.0)
         desiredPosition = -30;
@@ -100,7 +102,7 @@ void Servo::setPositionInDeg(float desiredPosition) {
     this->previousError = error;
 };
 
-void Servo::setMotorTorque(float speed) {
+void LocalServo::setMotorTorque(float speed) {
     // The level at which the motor starts moving
     float zeroSpeed = 0.0 / 5.0 * 255.0;
     float maxSpeed = 255.0;
@@ -121,7 +123,7 @@ void Servo::setMotorTorque(float speed) {
     }
 }
 
-void Servo::torqueOff() {
+void LocalServo::torqueOff() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
     digitalWrite(this->EN, LOW);
