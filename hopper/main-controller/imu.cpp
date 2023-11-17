@@ -13,10 +13,8 @@ void IMU::begin() {
             ;
     }
 
-    Serial.println("DONE");
-
-    // Changes the orientation, but not as expected based on the docs
-    // this->bno.setAxisRemap(0x24);
+    Wire.setClock(400000);
+    Serial.println("Setup done");
 }
 
 Vector IMU::getLinearAcceleration() {

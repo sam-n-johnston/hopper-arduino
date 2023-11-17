@@ -1,4 +1,5 @@
 #include "InverseKinematics.h"
+#include "imu.h"
 #include "leg.h"
 #include "localServo.h"
 #include "spiServo.h"
@@ -6,6 +7,8 @@
 const int SER1_PWM1 = 3, SER1_PWM2 = 5, SER1_OCM = A0, SER1_DIAG = 7,
           SER1_EN = 8, SER1_AS5600_MULTIPLEXER_PIN = -1;
 const int SER2_AND_3_CHIP_SELECT_PIN = 10;
+
+IMU customImu = IMU();
 
 LocalServo servo1 = LocalServo(
     SER1_PWM1,
@@ -36,6 +39,7 @@ void setup() {
     Serial.println("Setup Done");
     leg.begin();
     leg.torqueOn();
+    customImu.begin();
 }
 
 long lastSecond = 0;
@@ -54,12 +58,23 @@ void loop() {
 
     long int time = millis();
 
+    Vector linearAcceleration = customImu.getLinearAcceleration();
+    Vector linearVelocity = customImu.getComputedLinearVelocity();
+    Vector bodyOrientation = customImu.getOrientation();
+    Vector angularVelocity = customImu.getAngularVelocity();
+
+    // Serial.print("Got orientation - x: ");
+    // Serial.print(bodyOrientation.x);
+    // Serial.print("; y: ");
+    // Serial.print(bodyOrientation.y);
+    // Serial.println();
+
     float theta1;
     float theta2;
     float theta3;
 
     int test = servo2.getCurrentPosition();
-    delay(2);
+    // delay(2);
 
     bool result = leg.isFootTouchingGround();
 
