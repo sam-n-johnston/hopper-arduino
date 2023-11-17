@@ -173,11 +173,9 @@ void loop() {
             currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
     }
 
-    if (digitalRead(chipSelectPin) == HIGH) {
-        if (pos > 0) {
-            Serial.println("Failed to process message");
-            pos = 0;
-        }
+    if (digitalRead(chipSelectPin) == HIGH && pos > 0) {
+        Serial.println("Failed to process message");
+        pos = 0;
     }
 
     // int pos = servo3.getCurrentPosition();
@@ -199,6 +197,4 @@ void loop() {
         servo3.getCurrentPosition();
         servo3.torqueOff();
     }
-
-    delay(1); // TODO: remove if it doesn't cause issue
 }

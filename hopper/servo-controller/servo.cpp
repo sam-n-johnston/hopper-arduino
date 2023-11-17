@@ -41,7 +41,8 @@ void Servo::begin() {
 
     tcaselect(this->as5600MultiplexerPin);
     // Setup encoder
-    as5600.begin(4);                        //  set direction pin.
+    as5600.begin(4); //  set direction pin.
+    Wire.setClock(1000000);
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
     int b = as5600.isConnected();
@@ -71,9 +72,7 @@ int Servo::getCurrentPosition() {
     return this->mostRecentPosition;
 }
 
-int Servo::getMostRecentPosition() {
-    return this->mostRecentPosition;
-}
+int Servo::getMostRecentPosition() { return this->mostRecentPosition; }
 
 float Servo::getPIDOutput(float error) {
     float kp = 5.75; // Pc ~140?

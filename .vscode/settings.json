@@ -14,6 +14,8 @@
         "initializer_list": "cpp",
         "unordered_map": "cpp",
         "bitset": "cpp",
-        "__node_handle": "cpp"
+        "__node_handle": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp"
     }
 }

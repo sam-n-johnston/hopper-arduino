@@ -59,7 +59,7 @@ void loop() {
     float theta3;
 
     int test = servo2.getCurrentPosition();
-    // delay(2500);
+    delay(2);
 
     Serial.print("Got servo 2: ");
     Serial.println(test);
