@@ -32,8 +32,7 @@ void Leg::setPosition(float x, float y, float z) {
 }
 
 bool Leg::isFootTouchingGround() {
-    int sensorPin = A0;
-    int sensorValue = analogRead(sensorPin);
+    int sensorValue = analogRead(this->footSensorPin);
 
     // Serial.print("Sensor value: ");
     // Serial.println(sensorValue);

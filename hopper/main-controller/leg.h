@@ -17,6 +17,7 @@ private:
     void sendGoalPositionToServo(int servoId, int data);
     void torqueOffForServo(int servoId);
     void torqueOnForServo(int servoId);
+    int footSensorPin = A1;
 
 public:
     Leg(IServo *servo1, IServo *servo2, IServo *servo3);

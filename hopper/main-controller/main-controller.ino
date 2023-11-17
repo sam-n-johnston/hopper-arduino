@@ -61,8 +61,10 @@ void loop() {
     int test = servo2.getCurrentPosition();
     delay(2);
 
-    Serial.print("Got servo 2: ");
-    Serial.println(test);
+    bool result = leg.isFootTouchingGround();
+
+    // Serial.print("Got servo 2: ");
+    // Serial.println(test);
 
     // float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
 
