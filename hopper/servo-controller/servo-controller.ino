@@ -27,7 +27,7 @@ const int SER3_PWM1 = 5, SER3_PWM2 = 3, SER3_OCM = A2, SER3_DIAG = A3,
           SER3_EN = A0, SER3_AS5600 = 6;
 
 Servo servo2 = Servo(
-    SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_AS5600, 930, true);
+    SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_AS5600, 3480, true);
 Servo servo3 = Servo(
     SER3_PWM1,
     SER3_PWM2,
@@ -106,9 +106,16 @@ ISR(SPI_STC_vect) // Interrupt routine function
     }
 
     if (data == QUERY_GET_POSITION2 || data == QUERY_GET_POSITION3) {
-        request = data;
+        // Set current position in memory
+        if (data == QUERY_GET_POSITION2)
+            currentPositionThatIsBeingSent = servo2.getMostRecentPosition();
+        else
+            currentPositionThatIsBeingSent = servo3.getMostRecentPosition();
+
+        byte firstByte = currentPositionThatIsBeingSent >> 8;
+        SPDR = firstByte;
+        replyPosition++;
         sendingPosition = true;
-        readyToProcessData = true;
         return;
     }
 
@@ -143,7 +150,20 @@ ISR(SPI_STC_vect) // Interrupt routine function
         readyToProcessData = true;
 }
 
+long lastSecond = 0;
+long loops = 0;
+
 void loop() {
+    loops++;
+    long currTime = millis();
+
+    if (lastSecond + 1000 < currTime) {
+        lastSecond = currTime;
+        // Serial.print("Current hz: ");
+        Serial.println(loops);
+        loops = 0;
+    }
+
     if (readyToProcessData) {
         pos = 0;
         readyToProcessData = false;
@@ -151,18 +171,6 @@ void loop() {
             currentGoalPosition2 = (bytes[1] << 8) | bytes[2];
         else if (!sendingPosition && request == COMMAND_SET_GOAL_POSITION3)
             currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
-        else {
-            // Set current position in memory
-            if (request == QUERY_GET_POSITION2)
-                currentPositionThatIsBeingSent = servo2.getCurrentPosition();
-            else
-                currentPositionThatIsBeingSent = servo3.getCurrentPosition();
-
-            // Prepare first byte
-            byte firstByte = currentPositionThatIsBeingSent >> 8;
-            SPDR = firstByte;
-            replyPosition++;
-        }
     }
 
     if (digitalRead(chipSelectPin) == HIGH) {
@@ -172,23 +180,23 @@ void loop() {
         }
     }
 
-    // int pos = servo2.getCurrentPosition();
-    // Serial.print("currentGoalPosition2: ");
-    // Serial.println(currentGoalPosition2);
+    // int pos = servo3.getCurrentPosition();
+    // Serial.print("pos: ");
+    // Serial.println(pos);
 
     // servo3.setPositionInDeg(-30.0);
 
     if (torqueOn2)
         servo2.setPositionInDeg(currentGoalPosition2);
     else {
-        // servo2.getCurrentPosition();
+        servo2.getCurrentPosition();
         servo2.torqueOff();
     }
 
     if (torqueOn3)
         servo3.setPositionInDeg(currentGoalPosition3);
     else {
-        // servo3.getCurrentPosition();
+        servo3.getCurrentPosition();
         servo3.torqueOff();
     }
 

@@ -25,13 +25,13 @@ void SPIServo::begin() {
 int SPIServo::getCurrentPosition() {
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
     byte m_receive1 = SPI.transfer(this->getPositionQuery);
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
     byte m_receive2 = SPI.transfer(0xFF);
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
     byte m_receive3 = SPI.transfer(0xFF);
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
 
     digitalWrite(this->chipSelectPin, HIGH);
 
@@ -48,17 +48,17 @@ void SPIServo::setPositionInDeg(float desiredPosition) {
 
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
     byte m_receive1 = SPI.transfer(this->setPositionCommand);
 
     byte firstByte = data >> 8;
     byte secondByte = data;
 
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
     byte m_receive2 = SPI.transfer(firstByte);
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
     byte m_receive3 = SPI.transfer(secondByte);
-    delayMicroseconds(1250);
+    delayMicroseconds(75);
 
     digitalWrite(this->chipSelectPin, HIGH);
 };

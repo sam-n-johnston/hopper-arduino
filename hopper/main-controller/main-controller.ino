@@ -38,12 +38,12 @@ void setup() {
     leg.torqueOn();
 }
 
-int lastSecond = 0;
-int loops = 0;
+long lastSecond = 0;
+long loops = 0;
 
 void loop() {
     loops++;
-    long int currTime = millis();
+    long currTime = millis();
 
     if (lastSecond + 1000 < currTime) {
         lastSecond = currTime;
@@ -58,7 +58,13 @@ void loop() {
     float theta2;
     float theta3;
 
-    float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
+    int test = servo2.getCurrentPosition();
+    // delay(2500);
 
-    leg.setPosition(0, 0, zValue);
+    Serial.print("Got servo 2: ");
+    Serial.println(test);
+
+    // float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
+
+    // leg.setPosition(0, 0, zValue);
 }

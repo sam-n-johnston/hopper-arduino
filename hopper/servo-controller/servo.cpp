@@ -66,7 +66,13 @@ int Servo::getCurrentPosition() {
                      ? (this->currentTurn * 4096 + encoderAngle) - zeroPosition
                      : zeroPosition - (this->currentTurn * 4096 + encoderAngle);
 
-    return result * 360.0 / 4096.0;
+    this->mostRecentPosition = result * 360.0 / 4096.0;
+
+    return this->mostRecentPosition;
+}
+
+int Servo::getMostRecentPosition() {
+    return this->mostRecentPosition;
 }
 
 float Servo::getPIDOutput(float error) {

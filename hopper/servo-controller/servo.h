@@ -19,6 +19,7 @@ private:
     uint8_t EN;
     uint8_t as5600MultiplexerPin;
     int zeroPosition = 0;
+    int mostRecentPosition = 0;
     bool direction;
     int previousPosition = 0;
     unsigned long previousPositionTime = 0;
@@ -46,6 +47,7 @@ public:
     void setPositionInDeg(float deg);
     void torqueOff();
     int getCurrentPosition();
+    int getMostRecentPosition();
 };
 
 #endif
