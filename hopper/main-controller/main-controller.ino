@@ -66,6 +66,12 @@ void loop() {
         loops = 0;
     }
 
+    leg.setPosition(40, 0, -100);
+    // int pos = servo1.getCurrentPosition();
+
+    // Serial.print("positions: ");
+    // Serial.println(pos);
+
     // if (!robotFell) {
     //     if (lastMillisIMU + 50 < currTime) {
     //         lastMillisIMU = currTime;

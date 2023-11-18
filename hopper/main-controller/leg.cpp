@@ -26,6 +26,9 @@ void Leg::setPosition(float x, float y, float z) {
         theta2,
         theta3);
 
+    Serial.print("positions: ");
+    Serial.println(-theta3);
+
     this->servo1->setPositionInDeg(-theta1);
     this->servo2->setPositionInDeg(-theta2);
     this->servo3->setPositionInDeg(-theta3);
