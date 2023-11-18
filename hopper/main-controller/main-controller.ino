@@ -44,6 +44,7 @@ void setup() {
 
 long lastSecond = 0;
 long loops = 0;
+long lastMillisIMU = 0;
 
 void loop() {
     loops++;
@@ -56,12 +57,19 @@ void loop() {
         loops = 0;
     }
 
-    long int time = millis();
+    if (lastMillisIMU + 50 < currTime) {
+        lastMillisIMU = currTime;
+        bool isFootTouchingGround = leg.isFootTouchingGround();
 
-    // Vector linearAcceleration = customImu.getLinearAcceleration();
-    // Vector linearVelocity = customImu.getComputedLinearVelocity();
-    // Vector bodyOrientation = customImu.getOrientation();
-    // Vector angularVelocity = customImu.getAngularVelocity();
+        if (isFootTouchingGround) {
+            Vector bodyOrientation = customImu.getOrientation();
+        } else {
+            Vector bodyOrientation = customImu.getOrientation();
+            Vector linearAcceleration = customImu.getLinearAcceleration();
+            Vector linearVelocity = customImu.getComputedLinearVelocity();
+            Vector angularVelocity = customImu.getAngularVelocity();
+        }
+    }
 
     // Serial.print("Got orientation - x: ");
     // Serial.print(bodyOrientation.x);
@@ -75,8 +83,6 @@ void loop() {
 
     // int test = servo1.getCurrentPosition();
     // delay(2);
-
-    // bool result = leg.isFootTouchingGround();
 
     float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
 

@@ -25,13 +25,13 @@ void SPIServo::begin() {
 int SPIServo::getCurrentPosition() {
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(25);
+    delayMicroseconds(15);
     byte m_receive1 = SPI.transfer(this->getPositionQuery);
-    delayMicroseconds(25);
+    delayMicroseconds(15);
     byte m_receive2 = SPI.transfer(0xFF);
-    delayMicroseconds(25);
+    delayMicroseconds(15);
     byte m_receive3 = SPI.transfer(0xFF);
-    delayMicroseconds(25);
+    delayMicroseconds(15);
 
     digitalWrite(this->chipSelectPin, HIGH);
 
@@ -50,17 +50,17 @@ void SPIServo::setPositionInDeg(float desiredPosition) {
 
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(25);
+    delayMicroseconds(15);
     byte m_receive1 = SPI.transfer(this->setPositionCommand);
 
     byte firstByte = data >> 8;
     byte secondByte = data;
 
-    delayMicroseconds(25);
+    delayMicroseconds(15);
     byte m_receive2 = SPI.transfer(firstByte);
-    delayMicroseconds(25);
+    delayMicroseconds(15);
     byte m_receive3 = SPI.transfer(secondByte);
-    delayMicroseconds(25);
+    delayMicroseconds(15);
 
     digitalWrite(this->chipSelectPin, HIGH);
 };
@@ -68,9 +68,9 @@ void SPIServo::setPositionInDeg(float desiredPosition) {
 void SPIServo::torqueOn() {
     digitalWrite(this->chipSelectPin, LOW);
 
-    delay(10);
+    delay(15);
     byte m_receive1 = SPI.transfer(this->torqueOnCommand);
-    delay(10);
+    delay(15);
 
     digitalWrite(this->chipSelectPin, HIGH);
 }
@@ -78,9 +78,9 @@ void SPIServo::torqueOn() {
 void SPIServo::torqueOff() {
     digitalWrite(this->chipSelectPin, LOW);
 
-    delay(10);
+    delay(15);
     byte m_receive1 = SPI.transfer(this->torqueOffCommand);
-    delay(10);
+    delay(15);
 
     digitalWrite(this->chipSelectPin, HIGH);
 }

@@ -23,7 +23,7 @@ private:
     bool direction;
     int previousPosition = 0;
     unsigned long previousPositionTime = 0;
-    uint8_t deltaTime = 0;
+    int deltaTime = 0;
     float integralError = 0.0;
     float previousError = 0.0;
     int currentTurn = 0;

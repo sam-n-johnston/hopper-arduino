@@ -101,7 +101,9 @@ void LocalServo::setPositionInDeg(float desiredPosition) {
     if (desiredPosition > -5.0 || desiredPosition < -130.0)
         desiredPosition = -30;
 
-    this->deltaTime = micros() - previousPositionTime;
+    unsigned long currentTime = micros();
+    this->deltaTime = currentTime - previousPositionTime;
+
     int currentPosition = this->getCurrentPosition();
 
     float error = desiredPosition - currentPosition;
@@ -111,7 +113,7 @@ void LocalServo::setPositionInDeg(float desiredPosition) {
 
     setMotorTorque(output);
 
-    this->previousPositionTime = micros();
+    this->previousPositionTime = currentTime;
     this->previousError = error;
 };
 
