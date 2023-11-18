@@ -42,6 +42,8 @@ void setup() {
 
     robot.begin();
     customImu.begin();
+
+    leg.setPosition(0, 0, -100);
 }
 
 long lastSecond = 0;
@@ -64,62 +66,62 @@ void loop() {
         loops = 0;
     }
 
-    if (!robotFell) {
-        if (lastMillisIMU + 50 < currTime) {
-            lastMillisIMU = currTime;
-            bool isFootTouchingGround = leg.isFootTouchingGround();
+    // if (!robotFell) {
+    //     if (lastMillisIMU + 50 < currTime) {
+    //         lastMillisIMU = currTime;
+    //         bool isFootTouchingGround = leg.isFootTouchingGround();
 
-            if (isFootTouchingGround) {
-                bodyOrientation = customImu.getOrientation();
-            } else {
-                bodyOrientation = customImu.getOrientation();
-                linearVelocity = customImu.getComputedLinearVelocity();
-                angularVelocity = customImu.getAngularVelocity();
-            }
-        }
+    //         if (isFootTouchingGround) {
+    //             bodyOrientation = customImu.getOrientation();
+    //         } else {
+    //             bodyOrientation = customImu.getOrientation();
+    //             linearVelocity = customImu.getComputedLinearVelocity();
+    //             angularVelocity = customImu.getAngularVelocity();
+    //         }
+    //     }
 
-        robot.updateStateIfChanged();
-        if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-            robot.getCurrentState() == STANCE_GOING_UP) {
-            robot.sendCommandsToDuringStance(
-                bodyOrientation.x, bodyOrientation.y);
-        } else {
+    //     robot.updateStateIfChanged();
+    //     if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+    //         robot.getCurrentState() == STANCE_GOING_UP) {
+    //         robot.sendCommandsToDuringStance(
+    //             bodyOrientation.x, bodyOrientation.y);
+    //     } else {
 
-            robot.sendCommandsToMotorsDuringFlight(
-                linearVelocity.x,
-                linearVelocity.y,
-                bodyOrientation.x,
-                bodyOrientation.y,
-                angularVelocity.x,
-                angularVelocity.y);
-        }
+    //         robot.sendCommandsToMotorsDuringFlight(
+    //             linearVelocity.x,
+    //             linearVelocity.y,
+    //             bodyOrientation.x,
+    //             bodyOrientation.y,
+    //             angularVelocity.x,
+    //             angularVelocity.y);
+    //     }
 
-        // Serial.print("Got orientation - x: ");
-        // Serial.print(bodyOrientation.x);
-        // Serial.print("; y: ");
-        // Serial.print(bodyOrientation.y);
-        // Serial.println();
+    //     // Serial.print("Got orientation - x: ");
+    //     // Serial.print(bodyOrientation.x);
+    //     // Serial.print("; y: ");
+    //     // Serial.print(bodyOrientation.y);
+    //     // Serial.println();
 
-        // float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
+    //     // float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
 
-        // float theta1;
-        // float theta2;
-        // float theta3;
+    //     // float theta1;
+    //     // float theta2;
+    //     // float theta3;
 
-        // int status = delta_calcInverse(
-        //     0, 0, static_cast<int>(zValue), theta1, theta2, theta3);
+    //     // int status = delta_calcInverse(
+    //     //     0, 0, static_cast<int>(zValue), theta1, theta2, theta3);
 
-        // Serial.print("Got servo 2: ");
-        // Serial.println(-theta1);
+    //     // Serial.print("Got servo 2: ");
+    //     // Serial.println(-theta1);
 
-        // servo1.setPositionInDeg(-theta1);
-        // servo2.setPositionInDeg(-theta2);
-        // servo3.setPositionInDeg(-theta3);
+    //     // servo1.setPositionInDeg(-theta1);
+    //     // servo2.setPositionInDeg(-theta2);
+    //     // servo3.setPositionInDeg(-theta3);
 
-        if (robot.hasFallen(customImu.getGravity())) {
-            robot.stop();
-            robotFell = true;
-            Serial.println("Stopping motors because robot fell");
-        }
-    }
+    //     if (robot.hasFallen(customImu.getGravity())) {
+    //         robot.stop();
+    //         robotFell = true;
+    //         Serial.println("Stopping motors because robot fell");
+    //     }
+    // }
 }

@@ -13,11 +13,6 @@ private:
     IServo *servo1;
     IServo *servo2;
     IServo *servo3;
-    void setupServos();
-    int getPositionFromGearServo(int servoId);
-    void sendGoalPositionToServo(int servoId, int data);
-    void torqueOffForServo(int servoId);
-    void torqueOnForServo(int servoId);
     int footSensorPin = A1;
 
 public:
@@ -25,11 +20,12 @@ public:
 
     void begin();
     void setPosition(float x, float y, float z);
-    Vector getPosition();
+    Vector getFootPosition();
     float getAlphaXInDeg();
     float getAlphaYInDeg();
     void setDesiredAlphaXInDeg(float deg);
     void setDesiredAlphaYInDeg(float deg);
+    void pushByFactor(float factor);
     bool isFootTouchingGround();
     void torqueOff();
     void torqueOn();

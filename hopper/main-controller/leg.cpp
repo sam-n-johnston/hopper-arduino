@@ -31,7 +31,7 @@ void Leg::setPosition(float x, float y, float z) {
     this->servo3->setPositionInDeg(-theta3);
 }
 
-Vector Leg::getPosition() {
+Vector Leg::getFootPosition() {
     float x, y, z;
 
     int status = delta_calcForward(
@@ -54,13 +54,39 @@ Vector Leg::getPosition() {
     return position;
 }
 
-float Leg::getAlphaXInDeg() { return 0.0; }
+float Leg::getAlphaXInDeg() {
+    Vector pos = this->getFootPosition();
 
-float Leg::getAlphaYInDeg() { return 0.0; }
+    return atan(-pos.y / pos.z);
+}
 
-void Leg::setDesiredAlphaXInDeg(float deg) { return; }
+float Leg::getAlphaYInDeg() {
+    Vector pos = this->getFootPosition();
 
-void Leg::setDesiredAlphaYInDeg(float deg) { return; }
+    return atan(pos.x / pos.z);
+}
+
+void Leg::setDesiredAlphaXInDeg(float deg) {
+    Vector pos = this->getFootPosition();
+
+    float newY = -tan(deg) * pos.z;
+
+    setPosition(pos.x, newY, pos.z);
+}
+
+void Leg::setDesiredAlphaYInDeg(float deg) {
+    Vector pos = this->getFootPosition();
+
+    float newX = tan(deg) * pos.z;
+
+    setPosition(newX, pos.y, pos.z);
+}
+
+void Leg::pushByFactor(float factor) {
+    Vector pos = this->getFootPosition();
+
+    setPosition(factor * pos.x, factor * pos.y, factor * pos.z);
+}
 
 bool Leg::isFootTouchingGround() {
     int sensorValue = analogRead(this->footSensorPin);
