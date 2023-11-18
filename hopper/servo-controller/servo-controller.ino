@@ -27,7 +27,14 @@ const int SER3_PWM1 = 5, SER3_PWM2 = 3, SER3_OCM = A2, SER3_DIAG = A3,
           SER3_EN = A0, SER3_AS5600 = 6;
 
 Servo servo2 = Servo(
-    SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_AS5600, 3480, true);
+    SER2_PWM1,
+    SER2_PWM2,
+    SER2_OCM,
+    SER2_DIAG,
+    SER2_EN,
+    SER2_AS5600,
+    3480,
+    true);
 Servo servo3 = Servo(
     SER3_PWM1,
     SER3_PWM2,
@@ -146,8 +153,13 @@ ISR(SPI_STC_vect) // Interrupt routine function
         bytes[pos++] = data;
     }
 
-    if (pos >= 3)
-        readyToProcessData = true;
+    if (pos >= 3) {
+        pos = 0;
+        if (request == COMMAND_SET_GOAL_POSITION2)
+            currentGoalPosition2 = (bytes[1] << 8) | bytes[2];
+        else
+            currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
+    }
 }
 
 long lastSecond = 0;
@@ -164,25 +176,16 @@ void loop() {
         loops = 0;
     }
 
-    if (readyToProcessData) {
-        pos = 0;
-        readyToProcessData = false;
-        if (!sendingPosition && request == COMMAND_SET_GOAL_POSITION2)
-            currentGoalPosition2 = (bytes[1] << 8) | bytes[2];
-        else if (!sendingPosition && request == COMMAND_SET_GOAL_POSITION3)
-            currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
-    }
-
     if (digitalRead(chipSelectPin) == HIGH && pos > 0) {
         Serial.println("Failed to process message");
         pos = 0;
     }
 
-    // int pos = servo3.getCurrentPosition();
-    // Serial.print("pos: ");
-    // Serial.println(pos);
+    // int val = servo2.getCurrentPosition();
+    // Serial.print("torque3: ");
+    // Serial.println(val);
 
-    // servo3.setPositionInDeg(-30.0);
+    // int zValue = -30.0 - 25.0 * sin(millis() / 100.0);
 
     if (torqueOn2)
         servo2.setPositionInDeg(currentGoalPosition2);

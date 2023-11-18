@@ -89,7 +89,7 @@ float LocalServo::getPIDOutput(float error) {
     float kd = 0.0;
     float ki = 0.0;
 
-    float deltaError = (this->previousError - error) / this->deltaTime;
+    float deltaError = (this->previousError - error) / this->deltaTime / 1000.0;
 
     float output = kp * error + kp * deltaError + ki * this->integralError;
 
@@ -101,17 +101,17 @@ void LocalServo::setPositionInDeg(float desiredPosition) {
     if (desiredPosition > -5.0 || desiredPosition < -130.0)
         desiredPosition = -30;
 
-    this->deltaTime = millis() - previousPositionTime;
+    this->deltaTime = micros() - previousPositionTime;
     int currentPosition = this->getCurrentPosition();
 
     float error = desiredPosition - currentPosition;
-    this->integralError += error * this->deltaTime;
+    this->integralError += error * this->deltaTime / 1000.0;
 
     float output = this->getPIDOutput(error);
 
     setMotorTorque(output);
 
-    this->previousPositionTime = millis();
+    this->previousPositionTime = micros();
     this->previousError = error;
 };
 
@@ -124,6 +124,9 @@ void LocalServo::setMotorTorque(float speed) {
 
     if (adjustedSpeed > maxSpeed)
         adjustedSpeed = maxSpeed;
+
+    // Serial.print("Setting torque...");
+    // Serial.println(adjustedSpeed);
 
     if (speed > 0) {
         digitalWrite(this->EN, 1);

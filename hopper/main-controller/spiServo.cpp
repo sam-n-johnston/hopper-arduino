@@ -25,13 +25,13 @@ void SPIServo::begin() {
 int SPIServo::getCurrentPosition() {
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(75);
+    delayMicroseconds(25);
     byte m_receive1 = SPI.transfer(this->getPositionQuery);
-    delayMicroseconds(75);
+    delayMicroseconds(25);
     byte m_receive2 = SPI.transfer(0xFF);
-    delayMicroseconds(75);
+    delayMicroseconds(25);
     byte m_receive3 = SPI.transfer(0xFF);
-    delayMicroseconds(75);
+    delayMicroseconds(25);
 
     digitalWrite(this->chipSelectPin, HIGH);
 
@@ -43,22 +43,24 @@ int SPIServo::getCurrentPosition() {
 void SPIServo::setPositionInDeg(float desiredPosition) {
     int data = (int)desiredPosition;
     // Protect robot
-    if (data > -5 || data < -130)
+    if (data > -5 || data < -130) {
+        Serial.println("Tried to set position outside acceptable range");
         data = -30;
+    }
 
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(75);
+    delayMicroseconds(25);
     byte m_receive1 = SPI.transfer(this->setPositionCommand);
 
     byte firstByte = data >> 8;
     byte secondByte = data;
 
-    delayMicroseconds(75);
+    delayMicroseconds(25);
     byte m_receive2 = SPI.transfer(firstByte);
-    delayMicroseconds(75);
+    delayMicroseconds(25);
     byte m_receive3 = SPI.transfer(secondByte);
-    delayMicroseconds(75);
+    delayMicroseconds(25);
 
     digitalWrite(this->chipSelectPin, HIGH);
 };

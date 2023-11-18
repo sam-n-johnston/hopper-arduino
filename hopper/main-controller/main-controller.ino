@@ -58,10 +58,10 @@ void loop() {
 
     long int time = millis();
 
-    Vector linearAcceleration = customImu.getLinearAcceleration();
-    Vector linearVelocity = customImu.getComputedLinearVelocity();
-    Vector bodyOrientation = customImu.getOrientation();
-    Vector angularVelocity = customImu.getAngularVelocity();
+    // Vector linearAcceleration = customImu.getLinearAcceleration();
+    // Vector linearVelocity = customImu.getComputedLinearVelocity();
+    // Vector bodyOrientation = customImu.getOrientation();
+    // Vector angularVelocity = customImu.getAngularVelocity();
 
     // Serial.print("Got orientation - x: ");
     // Serial.print(bodyOrientation.x);
@@ -73,15 +73,22 @@ void loop() {
     float theta2;
     float theta3;
 
-    int test = servo2.getCurrentPosition();
+    // int test = servo1.getCurrentPosition();
     // delay(2);
 
-    bool result = leg.isFootTouchingGround();
+    // bool result = leg.isFootTouchingGround();
+
+    float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
+
+    int status = delta_calcInverse(
+        0, 0, static_cast<int>(zValue), theta1, theta2, theta3);
 
     // Serial.print("Got servo 2: ");
-    // Serial.println(test);
+    // Serial.println(-theta1);
 
-    // float zValue = -100.0 - 25.0 * sin(millis() / 100.0);
+    servo1.setPositionInDeg(-theta1);
+    servo2.setPositionInDeg(-theta2);
+    servo3.setPositionInDeg(-theta3);
 
     // leg.setPosition(0, 0, zValue);
 }
