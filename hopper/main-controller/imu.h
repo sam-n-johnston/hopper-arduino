@@ -1,16 +1,11 @@
 #ifndef IMU_H
 #define IMU_H
 
+#include "vector.h"
 #include <Adafruit_BNO055.h>
 #include <Adafruit_Sensor.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
-
-struct Vector {
-    float x;
-    float y;
-    float z;
-};
 
 class IMU {
 private:

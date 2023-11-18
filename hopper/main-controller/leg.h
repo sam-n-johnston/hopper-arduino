@@ -2,6 +2,7 @@
 #define LEG_H
 
 #include "servo.h"
+#include "vector.h"
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
@@ -24,6 +25,11 @@ public:
 
     void begin();
     void setPosition(float x, float y, float z);
+    Vector getPosition();
+    float getAlphaXInDeg();
+    float getAlphaYInDeg();
+    void setDesiredAlphaXInDeg(float deg);
+    void setDesiredAlphaYInDeg(float deg);
     bool isFootTouchingGround();
     void torqueOff();
     void torqueOn();

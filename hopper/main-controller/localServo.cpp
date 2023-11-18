@@ -127,9 +127,6 @@ void LocalServo::setMotorTorque(float speed) {
     if (adjustedSpeed > maxSpeed)
         adjustedSpeed = maxSpeed;
 
-    // Serial.print("Setting torque...");
-    // Serial.println(adjustedSpeed);
-
     if (speed > 0) {
         digitalWrite(this->EN, 1);
         analogWrite(this->PWM1, 0);

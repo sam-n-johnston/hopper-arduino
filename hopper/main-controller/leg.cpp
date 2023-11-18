@@ -31,13 +31,44 @@ void Leg::setPosition(float x, float y, float z) {
     this->servo3->setPositionInDeg(-theta3);
 }
 
+Vector Leg::getPosition() {
+    float x, y, z;
+
+    int status = delta_calcForward(
+        servo1->getCurrentPosition(),
+        servo2->getCurrentPosition(),
+        servo3->getCurrentPosition(),
+        x,
+        y,
+        z);
+
+    if (status != 0)
+        Serial.println("Failed to calculate forward kinematics");
+
+    Vector position;
+
+    position.x = x;
+    position.y = y;
+    position.z = z;
+
+    return position;
+}
+
+float Leg::getAlphaXInDeg() { return 0.0; }
+
+float Leg::getAlphaYInDeg() { return 0.0; }
+
+void Leg::setDesiredAlphaXInDeg(float deg) { return; }
+
+void Leg::setDesiredAlphaYInDeg(float deg) { return; }
+
 bool Leg::isFootTouchingGround() {
     int sensorValue = analogRead(this->footSensorPin);
 
     // Serial.print("Sensor value: ");
     // Serial.println(sensorValue);
 
-    if (sensorValue > 350)
+    if (sensorValue > 100)
         return true;
 
     return false;
