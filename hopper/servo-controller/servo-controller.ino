@@ -33,7 +33,7 @@ Servo servo2 = Servo(
     SER2_DIAG,
     SER2_EN,
     SER2_AS5600,
-    3480,
+    3150,
     true);
 Servo servo3 = Servo(
     SER3_PWM1,
@@ -42,7 +42,7 @@ Servo servo3 = Servo(
     SER3_DIAG,
     SER3_EN,
     SER3_AS5600,
-    2220,
+    1858,
     true);
 
 #define COMMAND_SET_GOAL_POSITION2 0
@@ -180,12 +180,6 @@ void loop() {
         Serial.println("Failed to process message");
         pos = 0;
     }
-
-    // int val = servo2.getCurrentPosition();
-    // Serial.print("torque3: ");
-    // Serial.println(val);
-
-    // int zValue = -30.0 - 25.0 * sin(millis() / 100.0);
 
     if (torqueOn2)
         servo2.setPositionInDeg(currentGoalPosition2);

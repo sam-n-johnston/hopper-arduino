@@ -9,7 +9,7 @@ const float rf = 50.42; // femur length
 
 // trigonometric constants
 const float sqrt3 = sqrt(3.0);
-const float pi = 3.141592653;
+const float pi = 3.141592653; // PI
 const float sin120 = sqrt3 / 2.0;
 const float cos120 = -0.5;
 const float tan60 = sqrt3;
@@ -93,18 +93,17 @@ int delta_calcAngleYZ(float x0, float y0, float z0, float &theta) {
 int delta_calcInverse(
     float x0, float y0, float z0, float &theta1, float &theta2, float &theta3) {
     theta1 = theta2 = theta3 = 0;
-    // Flipping x0 & y0 to match the robot's design
-    int status = delta_calcAngleYZ(y0, x0, z0, theta2);
+    int status = delta_calcAngleYZ(x0, y0, z0, theta1);
     if (status == 0)
         status = delta_calcAngleYZ(
-            y0 * cos120 + x0 * sin120,
-            x0 * cos120 - y0 * sin120,
-            z0,
-            theta1); // rotate coords to +120 deg
-    if (status == 0)
-        status = delta_calcAngleYZ(
-            y0 * cos120 - x0 * sin120,
             x0 * cos120 + y0 * sin120,
+            y0 * cos120 - x0 * sin120,
+            z0,
+            theta2); // rotate coords to +120 deg
+    if (status == 0)
+        status = delta_calcAngleYZ(
+            x0 * cos120 - y0 * sin120,
+            y0 * cos120 + x0 * sin120,
             z0,
             theta3); // rotate coords to -120 deg
     return status;

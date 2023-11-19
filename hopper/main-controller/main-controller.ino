@@ -6,20 +6,13 @@
 #include "spiServo.h"
 
 const int SER1_PWM1 = 3, SER1_PWM2 = 5, SER1_OCM = A0, SER1_DIAG = 7,
-          SER1_EN = 8, SER1_AS5600_MULTIPLEXER_PIN = -1;
+          SER1_EN = 8;
 const int SER2_AND_3_CHIP_SELECT_PIN = 10;
 
 IMU customImu = IMU();
 
-LocalServo servo1 = LocalServo(
-    SER1_PWM1,
-    SER1_PWM2,
-    SER1_OCM,
-    SER1_DIAG,
-    SER1_EN,
-    SER1_AS5600_MULTIPLEXER_PIN,
-    1360,
-    true);
+LocalServo servo1 =
+    LocalServo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, 1030, true);
 SPIServo servo2 = SPIServo(
     SER2_AND_3_CHIP_SELECT_PIN,
     QUERY_GET_POSITION2,
@@ -41,9 +34,11 @@ void setup() {
     Serial.println("Setup Done");
 
     robot.begin();
-    customImu.begin();
+    // customImu.begin();
 
-    leg.setPosition(0, 0, -100);
+    Wire.setClock(1000000);
+
+    leg.setFootPosition(0, 0, -100);
 }
 
 long lastSecond = 0;
@@ -66,7 +61,16 @@ void loop() {
         loops = 0;
     }
 
-    leg.setPosition(40, 0, -100);
+    // if (millis() < 3000)
+    // leg.setFootPosition(0, 0, -100);
+    // leg.getFootPosition();
+    // else
+    float valX = 15.0 * sin(millis() / 100.0);
+    float valY = 15.0 * cos(millis() / 100.0);
+
+    leg.setDesiredAlphaXYInDeg(valX, valY);
+    // leg.setDesiredAlphaYInDeg(0.0);
+
     // int pos = servo1.getCurrentPosition();
 
     // Serial.print("positions: ");

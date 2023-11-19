@@ -113,8 +113,8 @@ void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY) {
     float desiredAlphaXRotation = kp * (alphaDesiredX - alphaX) + alphaX;
     float desiredAlphaYRotation = kp * (alphaDesiredY - alphaY) + alphaY;
 
-    this->leg->setDesiredAlphaXInDeg(desiredAlphaXRotation);
-    this->leg->setDesiredAlphaYInDeg(desiredAlphaYRotation);
+    this->leg->setDesiredAlphaXYInDeg(
+        desiredAlphaXRotation, desiredAlphaYRotation);
 }
 
 void Robot::moveLegForDesiredHorizontalSpeed(
@@ -143,8 +143,8 @@ void Robot::moveLegForDesiredHorizontalSpeed(
     float alphaXDesired = 0; // asin(xErr / this->footLengthInMM);
     float alphaYDesired = 0; // asin(yErr / this->footLengthInMM);
 
-    this->leg->setDesiredAlphaXInDeg(alphaXDesired - bodyOrientationX);
-    this->leg->setDesiredAlphaYInDeg(alphaYDesired - bodyOrientationY);
+    this->leg->setDesiredAlphaXYInDeg(
+        alphaXDesired - bodyOrientationX, alphaYDesired - bodyOrientationY);
 }
 
 void Robot::stop() { leg->torqueOff(); }

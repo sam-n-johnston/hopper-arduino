@@ -46,9 +46,6 @@ void Servo::begin() {
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
     int b = as5600.isConnected();
-
-    if (as5600.readAngle() > this->zeroPosition)
-        this->currentTurn--;
 };
 
 int Servo::getCurrentPosition() {
@@ -76,20 +73,21 @@ int Servo::getMostRecentPosition() { return this->mostRecentPosition; }
 
 float Servo::getPIDOutput(float error) {
     float kp = 5.75; // Pc ~140?
-    float kd = 0.0;
+    float kd = 5.75;
     float ki = 0.0;
 
     float deltaError = (this->previousError - error) / this->deltaTime / 1000.0;
 
-    float output = kp * error + kp * deltaError + ki * this->integralError;
+    float output = kp * error + kd * deltaError + ki * this->integralError;
 
     return output;
 }
 
 void Servo::setPositionInDeg(float desiredPosition) {
-    // Protect robot
-    if (desiredPosition > -5.0 || desiredPosition < -130.0)
-        desiredPosition = -30;
+    if (desiredPosition > 30.0 || desiredPosition < -90.0) {
+        Serial.println("Tried to set position outside acceptable range");
+        desiredPosition = 0;
+    }
 
     this->deltaTime = micros() - previousPositionTime;
     int currentPosition = this->getCurrentPosition();

@@ -6,7 +6,7 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 
-extern SoftwareSerial DEBUG_SERIAL;
+const float degToRad = 0.0174533;
 
 class Leg {
 private:
@@ -14,18 +14,22 @@ private:
     IServo *servo2;
     IServo *servo3;
     int footSensorPin = A1;
+    float footExtension = 0;
+    float goalFootExtension = 0;
+    float goalX = 0;
+    float goalY = 0;
+    float goalZ = -100;
 
 public:
     Leg(IServo *servo1, IServo *servo2, IServo *servo3);
 
     void begin();
-    void setPosition(float x, float y, float z);
+    void setFootPosition(Vector position);
+    void setFootPosition(float x, float y, float z);
     Vector getFootPosition();
     float getAlphaXInDeg();
     float getAlphaYInDeg();
-    void setDesiredAlphaXInDeg(float deg);
-    void setDesiredAlphaYInDeg(float deg);
-    void pushByFactor(float factor);
+    void setDesiredAlphaXYInDeg(float degX, float degY);
     bool isFootTouchingGround();
     void torqueOff();
     void torqueOn();

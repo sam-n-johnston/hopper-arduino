@@ -13,7 +13,6 @@ private:
     uint8_t OCM;
     uint8_t DIAG;
     uint8_t EN;
-    uint8_t as5600MultiplexerPin;
     int zeroPosition = 0;
     bool direction;
     int previousPosition = 0;
@@ -34,7 +33,6 @@ public:
         uint8_t OCM,
         uint8_t DIAG,
         uint8_t EN,
-        uint8_t as5600MultiplexerPin,
         int zeroPosition,
         bool direction);
 

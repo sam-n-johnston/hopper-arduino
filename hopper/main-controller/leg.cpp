@@ -13,21 +13,25 @@ void Leg::begin() {
     this->servo3->begin();
 }
 
-void Leg::setPosition(float x, float y, float z) {
+void Leg::setFootPosition(Vector position) {
+    setFootPosition(position.x, position.y, position.z);
+}
+
+void Leg::setFootPosition(float x, float y, float z) {
+    float goalX = x;
+    float goalY = y;
+    float goalZ = z;
+
+    goalFootExtension = sqrt(goalX * goalX + goalY * goalY + goalZ * goalZ);
+
     float theta1;
     float theta2;
     float theta3;
 
-    int status = delta_calcInverse(
-        static_cast<int>(x),
-        static_cast<int>(y),
-        static_cast<int>(z),
-        theta1,
-        theta2,
-        theta3);
+    int status = delta_calcInverse(x, y, z, theta1, theta2, theta3);
 
-    Serial.print("positions: ");
-    Serial.println(-theta3);
+    if (status != 0)
+        Serial.println("Failed to calculate inverse kinematics");
 
     this->servo1->setPositionInDeg(-theta1);
     this->servo2->setPositionInDeg(-theta2);
@@ -38,9 +42,9 @@ Vector Leg::getFootPosition() {
     float x, y, z;
 
     int status = delta_calcForward(
-        servo1->getCurrentPosition(),
-        servo2->getCurrentPosition(),
-        servo3->getCurrentPosition(),
+        -servo1->getCurrentPosition(),
+        -servo2->getCurrentPosition(),
+        -servo3->getCurrentPosition(),
         x,
         y,
         z);
@@ -53,6 +57,8 @@ Vector Leg::getFootPosition() {
     position.x = x;
     position.y = y;
     position.z = z;
+
+    footExtension = sqrt(x * x + y * y + z * z);
 
     return position;
 }
@@ -69,26 +75,17 @@ float Leg::getAlphaYInDeg() {
     return atan(pos.x / pos.z);
 }
 
-void Leg::setDesiredAlphaXInDeg(float deg) {
-    Vector pos = this->getFootPosition();
+void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
+    float newY = sin(degX * degToRad) * goalFootExtension;
 
-    float newY = -tan(deg) * pos.z;
+    float projectedGoalFootExtensionX =
+        sqrt(goalFootExtension * goalFootExtension - newY * newY);
 
-    setPosition(pos.x, newY, pos.z);
-}
+    float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX;
+    float newZ = -sqrt(
+        goalFootExtension * goalFootExtension - newY * newY - newX * newX);
 
-void Leg::setDesiredAlphaYInDeg(float deg) {
-    Vector pos = this->getFootPosition();
-
-    float newX = tan(deg) * pos.z;
-
-    setPosition(newX, pos.y, pos.z);
-}
-
-void Leg::pushByFactor(float factor) {
-    Vector pos = this->getFootPosition();
-
-    setPosition(factor * pos.x, factor * pos.y, factor * pos.z);
+    setFootPosition(newX, newY, newZ);
 }
 
 bool Leg::isFootTouchingGround() {

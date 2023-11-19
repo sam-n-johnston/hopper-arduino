@@ -13,7 +13,7 @@ void IMU::begin() {
             ;
     }
 
-    Wire.setClock(400000);
+    // Wire.setClock(400000);
     Serial.println("Setup done");
 }
 

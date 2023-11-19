@@ -42,10 +42,9 @@ int SPIServo::getCurrentPosition() {
 
 void SPIServo::setPositionInDeg(float desiredPosition) {
     int data = (int)desiredPosition;
-    // Protect robot
-    if (data > -5 || data < -130) {
+    if (data > 30 || data < -90) {
         Serial.println("Tried to set position outside acceptable range");
-        data = -30;
+        data = 0;
     }
 
     digitalWrite(this->chipSelectPin, LOW);
