@@ -49,12 +49,10 @@ void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY) {
     switch (this->currentState) {
     case STANCE_GOING_DOWN:
-        // leg->movePusherToPosition(0.0);
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
         break;
     case STANCE_GOING_UP:
         // TODO: push hard
-        // leg->movePusherToPosition(30.0);
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
         break;
 
