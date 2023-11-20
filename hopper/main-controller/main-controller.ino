@@ -18,7 +18,7 @@ SPIServo servo1 = SPIServo(
     TORQUE_OFF1,
     TORQUE_ON1);
 LocalServo servo2 =
-    LocalServo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, 1030, true);
+    LocalServo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, 1030, true);
 SPIServo servo3 = SPIServo(
     SER1_AND_3_CHIP_SELECT_PIN,
     QUERY_GET_POSITION3,
@@ -122,8 +122,8 @@ void loop() {
 
         int status = delta_calcInverse(val1, 0, -100, theta1, theta2, theta3);
 
-        Serial.print("Got servo 2: ");
-        Serial.println(-theta2);
+        // Serial.print("Got servo 2: ");
+        // Serial.println(-theta2);
         // Serial.print(" - ");
         // Serial.println(-servo1.getCurrentPosition());
 
