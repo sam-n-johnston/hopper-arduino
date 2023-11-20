@@ -3,11 +3,9 @@
 Robot::Robot(Leg *leg) { this->leg = leg; }
 
 void Robot::begin() {
-    Serial.println("Starting robot...");
-
     this->leg->begin();
     this->leg->torqueOn();
-    Serial.println("Robot Started.");
+    Serial.println("Robot Setup Done");
 }
 
 void Robot::updateStateIfChanged() {

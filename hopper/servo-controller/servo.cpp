@@ -72,7 +72,7 @@ int Servo::getCurrentPosition() {
 int Servo::getMostRecentPosition() { return this->mostRecentPosition; }
 
 float Servo::getPIDOutput(float error) {
-    float kp = 5.75; // Pc ~140?
+    float kp = 7.0; // Pc ~140?
     float kd = 5.75;
     float ki = 0.0;
 

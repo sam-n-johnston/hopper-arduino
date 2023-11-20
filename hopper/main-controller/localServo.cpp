@@ -18,7 +18,6 @@ LocalServo::LocalServo(
 }
 
 void LocalServo::begin() {
-    Serial.println("starting local servo");
     // Setup gear motor
     pinMode(this->PWM1, OUTPUT);
     pinMode(this->PWM2, OUTPUT);
@@ -34,8 +33,10 @@ void LocalServo::begin() {
 
     int b = as5600.isConnected();
 
-    Serial.print("AS5600 connected: ");
-    Serial.println(b);
+    if (b == 0) 
+        Serial.print("AS5600 failed to connect!");
+
+    Serial.print("Local Servo Setup Done");
 };
 
 int LocalServo::getCurrentPosition() {
@@ -58,7 +59,7 @@ int LocalServo::getCurrentPosition() {
 }
 
 float LocalServo::getPIDOutput(float error) {
-    float kp = 5.75; // Pc ~140?
+    float kp = 7.0; // Pc ~140?
     float kd = 5.75;
     float ki = 0.0;
 

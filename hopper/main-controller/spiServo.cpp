@@ -14,12 +14,12 @@ SPIServo::SPIServo(
 }
 
 void SPIServo::begin() {
-    Serial.println("Setting up servos...");
     pinMode(this->chipSelectPin, OUTPUT);
     digitalWrite(this->chipSelectPin, HIGH);
 
     SPI.begin();
     SPI.setClockDivider(SPI_CLOCK_DIV4);
+    Serial.println("SPI Servo Setup Done");
 };
 
 int SPIServo::getCurrentPosition() {
