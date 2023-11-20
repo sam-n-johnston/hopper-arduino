@@ -5,22 +5,22 @@
 #include "robot.h"
 #include "spiServo.h"
 
-const int SER1_PWM1 = 3, SER1_PWM2 = 5, SER1_OCM = A0, SER1_DIAG = 7,
-          SER1_EN = 8;
-const int SER2_AND_3_CHIP_SELECT_PIN = 10;
+const int SER2_PWM1 = 3, SER2_PWM2 = 5, SER2_OCM = A0, SER2_DIAG = 7,
+          SER2_EN = 8;
+const int SER1_AND_3_CHIP_SELECT_PIN = 10;
 
 IMU customImu = IMU();
 
 SPIServo servo1 = SPIServo(
-    SER2_AND_3_CHIP_SELECT_PIN,
-    QUERY_GET_POSITION2,
-    COMMAND_SET_GOAL_POSITION2,
-    TORQUE_OFF2,
-    TORQUE_ON2);
+    SER1_AND_3_CHIP_SELECT_PIN,
+    QUERY_GET_POSITION1,
+    COMMAND_SET_GOAL_POSITION1,
+    TORQUE_OFF1,
+    TORQUE_ON1);
 LocalServo servo2 =
     LocalServo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, 1030, true);
 SPIServo servo3 = SPIServo(
-    SER2_AND_3_CHIP_SELECT_PIN,
+    SER1_AND_3_CHIP_SELECT_PIN,
     QUERY_GET_POSITION3,
     COMMAND_SET_GOAL_POSITION3,
     TORQUE_OFF3,
@@ -108,21 +108,19 @@ void loop() {
         //         angularVelocity.y);
         // }
 
-
         // Serial.print("Got orientation - x: ");
         // Serial.print(bodyOrientation.x);
         // Serial.print("; y: ");
         // Serial.print(bodyOrientation.y);
         // Serial.println();
 
-        float val1=  - 25.0 * sin(millis() / 1000.0);
+        float val1 = -25.0 * sin(millis() / 1000.0);
 
         float theta1;
         float theta2;
         float theta3;
 
-        int status = delta_calcInverse(
-            val1, 0, -100, theta1, theta2, theta3);
+        int status = delta_calcInverse(val1, 0, -100, theta1, theta2, theta3);
 
         Serial.print("Got servo 2: ");
         Serial.println(-theta2);

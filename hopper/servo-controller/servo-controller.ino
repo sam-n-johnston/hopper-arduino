@@ -45,13 +45,13 @@ Servo servo3 = Servo(
     1858,
     true);
 
-#define COMMAND_SET_GOAL_POSITION2 0
+#define COMMAND_SET_GOAL_POSITION1 0
 #define COMMAND_SET_GOAL_POSITION3 1
-#define QUERY_GET_POSITION2 2
+#define QUERY_GET_POSITION1 2
 #define QUERY_GET_POSITION3 3
-#define TORQUE_OFF2 4
+#define TORQUE_OFF1 4
 #define TORQUE_OFF3 5
-#define TORQUE_ON2 6
+#define TORQUE_ON1 6
 #define TORQUE_ON3 7
 
 // Change to int when testing 2 bytes.
@@ -112,9 +112,9 @@ ISR(SPI_STC_vect) // Interrupt routine function
         return;
     }
 
-    if (data == QUERY_GET_POSITION2 || data == QUERY_GET_POSITION3) {
+    if (data == QUERY_GET_POSITION1 || data == QUERY_GET_POSITION3) {
         // Set current position in memory
-        if (data == QUERY_GET_POSITION2)
+        if (data == QUERY_GET_POSITION1)
             currentPositionThatIsBeingSent = servo2.getMostRecentPosition();
         else
             currentPositionThatIsBeingSent = servo3.getMostRecentPosition();
@@ -126,7 +126,7 @@ ISR(SPI_STC_vect) // Interrupt routine function
         return;
     }
 
-    if (pos == 0 && data == TORQUE_OFF2) {
+    if (pos == 0 && data == TORQUE_OFF1) {
         torqueOn2 = false;
         return;
     }
@@ -136,7 +136,7 @@ ISR(SPI_STC_vect) // Interrupt routine function
         return;
     }
 
-    if (pos == 0 && data == TORQUE_ON2) {
+    if (pos == 0 && data == TORQUE_ON1) {
         torqueOn2 = true;
         return;
     }
@@ -155,7 +155,7 @@ ISR(SPI_STC_vect) // Interrupt routine function
 
     if (pos >= 3) {
         pos = 0;
-        if (request == COMMAND_SET_GOAL_POSITION2)
+        if (request == COMMAND_SET_GOAL_POSITION1)
             currentGoalPosition2 = (bytes[1] << 8) | bytes[2];
         else
             currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
