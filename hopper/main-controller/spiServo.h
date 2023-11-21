@@ -36,7 +36,7 @@ public:
         uint8_t torqueOnCommand);
 
     void begin();
-    int getCurrentPosition();
+    float getCurrentPosition();
     void setPositionInDeg(float deg);
     void torqueOn();
     void torqueOff();

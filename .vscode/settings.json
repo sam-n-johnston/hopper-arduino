@@ -16,6 +16,8 @@
         "bitset": "cpp",
         "__node_handle": "cpp",
         "ostream": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "chrono": "cpp",
+        "cmath": "cpp"
     }
 }

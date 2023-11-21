@@ -11,7 +11,7 @@ public:
     virtual void setPositionInDeg(float deg) = 0;
     virtual void torqueOn() = 0;
     virtual void torqueOff() = 0;
-    virtual int getCurrentPosition() = 0;
+    virtual float getCurrentPosition() = 0;
 };
 
 #endif

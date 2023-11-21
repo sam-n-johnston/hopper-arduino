@@ -22,16 +22,16 @@ void SPIServo::begin() {
     Serial.println("SPI Servo Setup Done");
 };
 
-int SPIServo::getCurrentPosition() {
+float SPIServo::getCurrentPosition() {
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(15);
+    delayMicroseconds(50);
     byte m_receive1 = SPI.transfer(this->getPositionQuery);
-    delayMicroseconds(15);
+    delayMicroseconds(50);
     byte m_receive2 = SPI.transfer(0xFF);
-    delayMicroseconds(15);
+    delayMicroseconds(50);
     byte m_receive3 = SPI.transfer(0xFF);
-    delayMicroseconds(15);
+    delayMicroseconds(50);
 
     digitalWrite(this->chipSelectPin, HIGH);
 
@@ -41,25 +41,28 @@ int SPIServo::getCurrentPosition() {
 }
 
 void SPIServo::setPositionInDeg(float desiredPosition) {
-    int data = (int)desiredPosition;
-    if (data > 30 || data < -90) {
+    if (desiredPosition > 30.0 || desiredPosition < -90.0) {
         Serial.println("Tried to set position outside acceptable range");
-        data = 0;
+        desiredPosition = 0.0;
     }
+
+    uint8_t storage[5];
+    storage[0] = this->setPositionCommand;
+    memcpy(storage + 1, &desiredPosition, 4);
 
     digitalWrite(this->chipSelectPin, LOW);
 
-    delayMicroseconds(15);
-    byte m_receive1 = SPI.transfer(this->setPositionCommand);
-
-    byte firstByte = data >> 8;
-    byte secondByte = data;
-
-    delayMicroseconds(15);
-    byte m_receive2 = SPI.transfer(firstByte);
-    delayMicroseconds(15);
-    byte m_receive3 = SPI.transfer(secondByte);
-    delayMicroseconds(15);
+    delayMicroseconds(50);
+    SPI.transfer(storage[0]);
+    delayMicroseconds(50);
+    SPI.transfer(storage[1]);
+    delayMicroseconds(50);
+    SPI.transfer(storage[2]);
+    delayMicroseconds(50);
+    SPI.transfer(storage[3]);
+    delayMicroseconds(50);
+    SPI.transfer(storage[4]);
+    delayMicroseconds(50);
 
     digitalWrite(this->chipSelectPin, HIGH);
 };

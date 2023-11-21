@@ -60,7 +60,7 @@ bool gettingCurrentPosition = false;
 int chipSelectPin = 10;
 
 // Used for SPI communication
-byte bytes[3];
+byte bytes[5];
 volatile byte pos;
 volatile boolean readyToProcessData;
 
@@ -69,10 +69,11 @@ volatile int positionToSend;
 volatile boolean sendingPosition;
 volatile byte request;
 int currentPositionThatIsBeingSent;
-int currentGoalPosition2 = 0;
-int currentGoalPosition3 = 0;
-bool torqueOn2 = false;
+float currentGoalPosition1 = 0.0;
+float currentGoalPosition3 = 0.0;
+bool torqueOn1 = false;
 bool torqueOn3 = false;
+volatile bool posted = false;
 
 void setup() {
     Serial.begin(115200);
@@ -112,7 +113,8 @@ ISR(SPI_STC_vect) // Interrupt routine function
         return;
     }
 
-    if (data == QUERY_GET_POSITION1 || data == QUERY_GET_POSITION3) {
+    if (pos == 0 &&
+        (data == QUERY_GET_POSITION1 || data == QUERY_GET_POSITION3)) {
         // Set current position in memory
         if (data == QUERY_GET_POSITION1)
             currentPositionThatIsBeingSent = servo2.getMostRecentPosition();
@@ -127,7 +129,7 @@ ISR(SPI_STC_vect) // Interrupt routine function
     }
 
     if (pos == 0 && data == TORQUE_OFF1) {
-        torqueOn2 = false;
+        torqueOn1 = false;
         return;
     }
 
@@ -137,7 +139,7 @@ ISR(SPI_STC_vect) // Interrupt routine function
     }
 
     if (pos == 0 && data == TORQUE_ON1) {
-        torqueOn2 = true;
+        torqueOn1 = true;
         return;
     }
 
@@ -146,19 +148,14 @@ ISR(SPI_STC_vect) // Interrupt routine function
         return;
     }
 
-    if (pos < sizeof(bytes)) {
-        if (pos == 0)
-            request = data;
+    bytes[pos++] = data;
 
-        bytes[pos++] = data;
-    }
-
-    if (pos >= 3) {
+    if (pos >= 5) {
         pos = 0;
-        if (request == COMMAND_SET_GOAL_POSITION1)
-            currentGoalPosition2 = (bytes[1] << 8) | bytes[2];
+        if (bytes[0] == COMMAND_SET_GOAL_POSITION1)
+            memcpy(&currentGoalPosition1, bytes + 1, 4);
         else
-            currentGoalPosition3 = (bytes[1] << 8) | bytes[2];
+            memcpy(&currentGoalPosition3, bytes + 1, 4);
     }
 }
 
@@ -181,8 +178,11 @@ void loop() {
         pos = 0;
     }
 
-    if (torqueOn2)
-        servo2.setPositionInDeg(currentGoalPosition2);
+    // Serial.print("got position: ");
+    // Serial.println(currentGoalPosition1);
+
+    if (torqueOn1)
+        servo2.setPositionInDeg(currentGoalPosition1);
     else {
         servo2.getCurrentPosition();
         servo2.torqueOff();

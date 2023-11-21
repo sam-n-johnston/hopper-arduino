@@ -33,13 +33,13 @@ void LocalServo::begin() {
 
     int b = as5600.isConnected();
 
-    if (b == 0) 
+    if (b == 0)
         Serial.print("AS5600 failed to connect!");
 
     Serial.print("Local Servo Setup Done");
 };
 
-int LocalServo::getCurrentPosition() {
+float LocalServo::getCurrentPosition() {
 
     int encoderAngle = as5600.readAngle();
 
@@ -59,8 +59,8 @@ int LocalServo::getCurrentPosition() {
 }
 
 float LocalServo::getPIDOutput(float error) {
-    float kp = 7.0; // Pc ~140?
-    float kd = 5.75;
+    float kp = 10.0; // Pc ~140?
+    float kd = 5.0;
     float ki = 0.0;
 
     float deltaError = (this->previousError - error) / this->deltaTime / 1000.0;
@@ -79,7 +79,7 @@ void LocalServo::setPositionInDeg(float desiredPosition) {
     unsigned long currentTime = micros();
     this->deltaTime = currentTime - previousPositionTime;
 
-    int currentPosition = this->getCurrentPosition();
+    float currentPosition = this->getCurrentPosition();
 
     float error = desiredPosition - currentPosition;
     this->integralError += error * this->deltaTime / 1000.0;

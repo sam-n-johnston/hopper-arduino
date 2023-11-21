@@ -40,7 +40,7 @@ public:
     void setPositionInDeg(float deg);
     void torqueOn();
     void torqueOff();
-    int getCurrentPosition();
+    float getCurrentPosition();
 };
 
 #endif

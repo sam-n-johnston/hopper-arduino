@@ -48,7 +48,7 @@ void Servo::begin() {
     int b = as5600.isConnected();
 };
 
-int Servo::getCurrentPosition() {
+float Servo::getCurrentPosition() {
     tcaselect(this->as5600MultiplexerPin);
     int encoderAngle = as5600.readAngle();
 
@@ -69,11 +69,11 @@ int Servo::getCurrentPosition() {
     return this->mostRecentPosition;
 }
 
-int Servo::getMostRecentPosition() { return this->mostRecentPosition; }
+float Servo::getMostRecentPosition() { return this->mostRecentPosition; }
 
 float Servo::getPIDOutput(float error) {
-    float kp = 7.0; // Pc ~140?
-    float kd = 5.75;
+    float kp = 2.5;
+    float kd = 25.0;
     float ki = 0.0;
 
     float deltaError = (this->previousError - error) / this->deltaTime / 1000.0;
@@ -90,9 +90,8 @@ void Servo::setPositionInDeg(float desiredPosition) {
     }
 
     this->deltaTime = micros() - previousPositionTime;
-    int currentPosition = this->getCurrentPosition();
 
-    float error = desiredPosition - currentPosition;
+    float error = desiredPosition - this->getCurrentPosition();
     this->integralError += error * this->deltaTime / 1000.0;
 
     float output = this->getPIDOutput(error);
@@ -105,7 +104,7 @@ void Servo::setPositionInDeg(float desiredPosition) {
 
 void Servo::setMotorTorque(float speed) {
     // The level at which the motor starts moving
-    float zeroSpeed = 0.0 / 5.0 * 255.0;
+    float zeroSpeed = 20.0;
     float maxSpeed = 255.0;
 
     float adjustedSpeed = speed == 0 ? 0.0 : abs(speed) + zeroSpeed;
@@ -116,10 +115,10 @@ void Servo::setMotorTorque(float speed) {
     if (speed > 0) {
         digitalWrite(this->EN, 1);
         analogWrite(this->PWM1, 0);
-        analogWrite(this->PWM2, round(adjustedSpeed));
+        analogWrite(this->PWM2, int(round(adjustedSpeed)));
     } else {
         digitalWrite(this->EN, 1);
-        analogWrite(this->PWM1, round(adjustedSpeed));
+        analogWrite(this->PWM1, int(round(adjustedSpeed)));
         analogWrite(this->PWM2, 0);
     }
 }

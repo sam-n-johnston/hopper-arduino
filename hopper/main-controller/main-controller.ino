@@ -120,12 +120,12 @@ void loop() {
         float theta2;
         float theta3;
 
-        int status = delta_calcInverse(val1, 0, -100, theta1, theta2, theta3);
+        int status = delta_calcInverse(0, val1, -100, theta1, theta2, theta3);
 
         // Serial.print("Got servo 2: ");
         // Serial.println(-theta2);
+        // Serial.println(servo2.getCurrentPosition());
         // Serial.print(" - ");
-        // Serial.println(-servo1.getCurrentPosition());
 
         servo1.setPositionInDeg(-theta1);
         servo2.setPositionInDeg(-theta2);
