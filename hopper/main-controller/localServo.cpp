@@ -72,8 +72,11 @@ float LocalServo::getPIDOutput(float error) {
 
 void LocalServo::setPositionInDeg(float desiredPosition) {
     if (desiredPosition > 30.0 || desiredPosition < -90.0) {
-        Serial.println("Tried to set position outside acceptable range");
-        desiredPosition = 0;
+        if (desiredPosition > 30.0) {
+            desiredPosition = 30.0;
+        } else {
+            desiredPosition = -90;
+        }
     }
 
     unsigned long currentTime = micros();

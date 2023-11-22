@@ -45,18 +45,18 @@ int Robot::getCurrentState() { return this->currentState; }
 
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY) {
-    switch (this->currentState) {
-    case STANCE_GOING_DOWN:
-        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-        break;
-    case STANCE_GOING_UP:
-        // TODO: push hard
-        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-        break;
+    // switch (this->currentState) {
+    // case STANCE_GOING_DOWN:
+    this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+    //     break;
+    // case STANCE_GOING_UP:
+    //     // TODO: push hard
+    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+    //     break;
 
-    default:
-        break;
-    }
+    // default:
+    //     break;
+    // }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(
@@ -140,7 +140,10 @@ void Robot::moveLegForDesiredHorizontalSpeed(
     float alphaYDesired = 0; // asin(yErr / this->footLengthInMM);
 
     this->leg->setDesiredAlphaXYInDeg(
-        alphaXDesired - bodyOrientationX, alphaYDesired - bodyOrientationY);
+        alphaXDesired - bodyOrientationX,
+        alphaYDesired - bodyOrientationY,
+        bodyOrientationX,
+        bodyOrientationY);
 }
 
 void Robot::stop() { leg->torqueOff(); }

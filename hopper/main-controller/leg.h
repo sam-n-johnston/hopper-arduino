@@ -14,6 +14,7 @@ private:
     IServo *servo2;
     IServo *servo3;
     int footSensorPin = A1;
+    float footLengthInMM = 45.0;
     float footExtension = 0;
     float goalFootExtension = 0;
     float goalX = 0;
@@ -30,6 +31,8 @@ public:
     float getAlphaXInDeg();
     float getAlphaYInDeg();
     void setDesiredAlphaXYInDeg(float degX, float degY);
+    void setDesiredAlphaXYInDeg(
+        float degX, float degY, float alphaXDeg, float alphaYDeg);
     bool isFootTouchingGround();
     void torqueOff();
     void torqueOn();

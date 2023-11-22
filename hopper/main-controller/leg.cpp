@@ -22,7 +22,12 @@ void Leg::setFootPosition(float x, float y, float z) {
     float goalY = y;
     float goalZ = z;
 
-    goalFootExtension = sqrt(goalX * goalX + goalY * goalY + goalZ * goalZ);
+    float tempGoalFootExtension =
+        sqrt(goalX * goalX + goalY * goalY + goalZ * goalZ);
+
+    // check if it's a NaN
+    if (tempGoalFootExtension == tempGoalFootExtension)
+        goalFootExtension = tempGoalFootExtension;
 
     float theta1;
     float theta2;
@@ -30,12 +35,14 @@ void Leg::setFootPosition(float x, float y, float z) {
 
     int status = delta_calcInverse(x, y, z, theta1, theta2, theta3);
 
-    if (status != 0)
+    // Check if angles are NaN
+    if (status != 0 || theta1 != theta1 || theta2 != theta2 || theta3 != theta3)
         Serial.println("Failed to calculate inverse kinematics");
-
-    this->servo1->setPositionInDeg(-theta1);
-    this->servo2->setPositionInDeg(-theta2);
-    this->servo3->setPositionInDeg(-theta3);
+    else {
+        this->servo1->setPositionInDeg(-theta1);
+        this->servo2->setPositionInDeg(-theta2);
+        this->servo3->setPositionInDeg(-theta3);
+    }
 }
 
 Vector Leg::getFootPosition() {
@@ -82,6 +89,22 @@ void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
         sqrt(goalFootExtension * goalFootExtension - newY * newY);
 
     float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX;
+    float newZ = -sqrt(
+        goalFootExtension * goalFootExtension - newY * newY - newX * newX);
+
+    setFootPosition(newX, newY, newZ);
+}
+
+void Leg::setDesiredAlphaXYInDeg(
+    float degX, float degY, float alphaXDeg, float alphaYDeg) {
+    float newY = sin(degX * degToRad) * goalFootExtension -
+                 sin(alphaXDeg * degToRad) * footLengthInMM;
+
+    float projectedGoalFootExtensionX =
+        sqrt(goalFootExtension * goalFootExtension - newY * newY);
+
+    float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX +
+                 sin(alphaYDeg * degToRad) * footLengthInMM;
     float newZ = -sqrt(
         goalFootExtension * goalFootExtension - newY * newY - newX * newX);
 

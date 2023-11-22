@@ -92,7 +92,7 @@ void loop() {
             }
         }
 
-        robot.updateStateIfChanged();
+        // robot.updateStateIfChanged();
         // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
         // robot.getCurrentState() == STANCE_GOING_UP) {
         // robot.sendCommandsToDuringStance(bodyOrientation.x,
@@ -105,7 +105,6 @@ void loop() {
             bodyOrientation.y,
             angularVelocity.x,
             angularVelocity.y);
-        // }
 
         // Serial.print("Got orientation - x: ");
         // Serial.print(bodyOrientation.x);
@@ -119,6 +118,8 @@ void loop() {
         float theta1;
         float theta2;
         float theta3;
+
+        // leg.setDesiredAlphaXYInDeg(0, 0, bodyOrientation.x, 0);
 
         // int status = delta_calcInverse(30, 0, -100, theta1, theta2, theta3);
 
