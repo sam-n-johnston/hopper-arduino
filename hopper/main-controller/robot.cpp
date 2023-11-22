@@ -66,29 +66,29 @@ void Robot::sendCommandsToMotorsDuringFlight(
     float bodyOrientationY,
     float bodyOrientationXDot,
     float bodyOrientationYDot) {
-    switch (this->currentState) {
-    case FLIGHT_GOING_UP:
-        this->moveLegForDesiredHorizontalSpeed(
-            xd,
-            yd,
-            bodyOrientationX,
-            bodyOrientationY,
-            bodyOrientationXDot,
-            bodyOrientationYDot);
-        break;
-    case FLIGHT_GOING_DOWN:
-        this->moveLegForDesiredHorizontalSpeed(
-            xd,
-            yd,
-            bodyOrientationX,
-            bodyOrientationY,
-            bodyOrientationXDot,
-            bodyOrientationYDot);
-        break;
+    // switch (this->currentState) {
+    // case FLIGHT_GOING_UP:
+    this->moveLegForDesiredHorizontalSpeed(
+        xd,
+        yd,
+        bodyOrientationX,
+        bodyOrientationY,
+        bodyOrientationXDot,
+        bodyOrientationYDot);
+    // break;
+    // case FLIGHT_GOING_DOWN:
+    //     this->moveLegForDesiredHorizontalSpeed(
+    //         xd,
+    //         yd,
+    //         bodyOrientationX,
+    //         bodyOrientationY,
+    //         bodyOrientationXDot,
+    //         bodyOrientationYDot);
+    //     break;
 
-    default:
-        break;
-    }
+    // default:
+    //     break;
+    // }
 }
 
 void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY) {

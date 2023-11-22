@@ -73,8 +73,8 @@ Vector IMU::getOrientation() {
     this->bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
 
     Vector orientation;
-    orientation.x = -orientationData.orientation.z;
-    orientation.y = -orientationData.orientation.y;
+    orientation.x = -orientationData.orientation.y;
+    orientation.y = orientationData.orientation.z;
     orientation.z = -orientationData.orientation.x;
 
     // Serial.print("Got orientation - x: ");

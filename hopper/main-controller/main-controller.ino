@@ -94,18 +94,17 @@ void loop() {
 
         robot.updateStateIfChanged();
         // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-        //     robot.getCurrentState() == STANCE_GOING_UP) {
-        //     robot.sendCommandsToDuringStance(
-        //         bodyOrientation.x, bodyOrientation.y);
-        // } else {
+        // robot.getCurrentState() == STANCE_GOING_UP) {
+        // robot.sendCommandsToDuringStance(bodyOrientation.x,
+        // bodyOrientation.y); } else {
 
-        //     robot.sendCommandsToMotorsDuringFlight(
-        //         linearVelocity.x,
-        //         linearVelocity.y,
-        //         bodyOrientation.x,
-        //         bodyOrientation.y,
-        //         angularVelocity.x,
-        //         angularVelocity.y);
+        robot.sendCommandsToMotorsDuringFlight(
+            linearVelocity.x,
+            linearVelocity.y,
+            bodyOrientation.x,
+            bodyOrientation.y,
+            angularVelocity.x,
+            angularVelocity.y);
         // }
 
         // Serial.print("Got orientation - x: ");
@@ -114,14 +113,14 @@ void loop() {
         // Serial.print(bodyOrientation.y);
         // Serial.println();
 
-        float val1 = -25.0 * sin(millis() / 100.0);
+        // float val1 = -25.0 * sin(millis() / 100.0);
         // float val1 = -100.0 - 25.0 * sin(millis() / 1000.0);
 
         float theta1;
         float theta2;
         float theta3;
 
-        int status = delta_calcInverse(val1, 0, -100, theta1, theta2, theta3);
+        // int status = delta_calcInverse(30, 0, -100, theta1, theta2, theta3);
 
         // Serial.print("Got servo 2: ");
         // Serial.print(theta2);
@@ -130,9 +129,9 @@ void loop() {
         // Serial.println(servo2.getCurrentPosition());
         // Serial.print(" - ");
 
-        servo1.setPositionInDeg(-theta1);
-        servo2.setPositionInDeg(-theta2);
-        servo3.setPositionInDeg(-theta3);
+        // servo1.setPositionInDeg(-theta1);
+        // servo2.setPositionInDeg(-theta2);
+        // servo3.setPositionInDeg(-theta3);
 
         // if (robot.hasFallen(customImu.getGravity())) {
         //     robot.stop();

@@ -73,7 +73,7 @@ float Servo::getCurrentPosition() {
 float Servo::getMostRecentPosition() { return this->mostRecentPosition; }
 
 float Servo::getPIDOutput(float error) {
-    float kp = 7.0;
+    float kp = 2.0;
     float kd = 0.0;
     float ki = 0.0;
 
@@ -111,7 +111,7 @@ void Servo::setMotorTorque(float speed) {
     float jolt = 0.0;
 
     if (this->positionDelta == 0) {
-        jolt = 28.0;
+        jolt = 15.0;
     }
 
     float adjustedSpeed = speed == 0 ? 0.0 : abs(speed) + zeroSpeed + jolt;
