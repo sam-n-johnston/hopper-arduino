@@ -16,6 +16,7 @@ private:
     int zeroPosition = 0;
     bool direction;
     int previousPosition = 0;
+    int positionDelta = 0;
     unsigned long previousPositionTime = 0;
     int deltaTime = 0;
     float integralError = 0.0;

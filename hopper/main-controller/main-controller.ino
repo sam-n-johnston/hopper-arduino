@@ -114,16 +114,19 @@ void loop() {
         // Serial.print(bodyOrientation.y);
         // Serial.println();
 
-        float val1 = -25.0 * sin(millis() / 1000.0);
+        float val1 = -25.0 * sin(millis() / 100.0);
+        // float val1 = -100.0 - 25.0 * sin(millis() / 1000.0);
 
         float theta1;
         float theta2;
         float theta3;
 
-        int status = delta_calcInverse(0, val1, -100, theta1, theta2, theta3);
+        int status = delta_calcInverse(val1, 0, -100, theta1, theta2, theta3);
 
         // Serial.print("Got servo 2: ");
-        // Serial.println(-theta2);
+        // Serial.print(theta2);
+        // Serial.print("; Error: ");
+        // Serial.println(-theta2 - servo2.getCurrentPosition());
         // Serial.println(servo2.getCurrentPosition());
         // Serial.print(" - ");
 

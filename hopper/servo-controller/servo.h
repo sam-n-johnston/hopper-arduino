@@ -21,6 +21,7 @@ private:
     int zeroPosition = 0;
     float mostRecentPosition = 0;
     bool direction;
+    int positionDelta = 0;
     int previousPosition = 0;
     unsigned long previousPositionTime = 0;
     int deltaTime = 0;

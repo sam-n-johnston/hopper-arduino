@@ -59,6 +59,7 @@ float Servo::getCurrentPosition() {
     if (this->previousPosition < 100 && encoderAngle > 4000)
         this->currentTurn--;
 
+    this->positionDelta = encoderAngle - this->previousPosition;
     this->previousPosition = encoderAngle;
     int result = direction
                      ? (this->currentTurn * 4096 + encoderAngle) - zeroPosition
@@ -72,8 +73,8 @@ float Servo::getCurrentPosition() {
 float Servo::getMostRecentPosition() { return this->mostRecentPosition; }
 
 float Servo::getPIDOutput(float error) {
-    float kp = 2.5;
-    float kd = 25.0;
+    float kp = 7.0;
+    float kd = 0.0;
     float ki = 0.0;
 
     float deltaError = (this->previousError - error) / this->deltaTime / 1000.0;
@@ -104,10 +105,16 @@ void Servo::setPositionInDeg(float desiredPosition) {
 
 void Servo::setMotorTorque(float speed) {
     // The level at which the motor starts moving
-    float zeroSpeed = 20.0;
+    float zeroSpeed = 0.0;
     float maxSpeed = 255.0;
 
-    float adjustedSpeed = speed == 0 ? 0.0 : abs(speed) + zeroSpeed;
+    float jolt = 0.0;
+
+    if (this->positionDelta == 0) {
+        jolt = 28.0;
+    }
+
+    float adjustedSpeed = speed == 0 ? 0.0 : abs(speed) + zeroSpeed + jolt;
 
     if (adjustedSpeed > maxSpeed)
         adjustedSpeed = maxSpeed;
