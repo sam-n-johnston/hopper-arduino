@@ -92,19 +92,21 @@ void loop() {
             }
         }
 
-        // robot.updateStateIfChanged();
-        // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-        // robot.getCurrentState() == STANCE_GOING_UP) {
-        // robot.sendCommandsToDuringStance(bodyOrientation.x,
-        // bodyOrientation.y); } else {
+        robot.updateStateIfChanged();
+        if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+            robot.getCurrentState() == STANCE_GOING_UP) {
+            robot.sendCommandsToDuringStance(
+                bodyOrientation.x, bodyOrientation.y);
+        } else {
 
-        robot.sendCommandsToMotorsDuringFlight(
-            linearVelocity.x,
-            linearVelocity.y,
-            bodyOrientation.x,
-            bodyOrientation.y,
-            angularVelocity.x,
-            angularVelocity.y);
+            robot.sendCommandsToMotorsDuringFlight(
+                linearVelocity.x,
+                linearVelocity.y,
+                bodyOrientation.x,
+                bodyOrientation.y,
+                angularVelocity.x,
+                angularVelocity.y);
+        }
 
         // Serial.print("Got orientation - x: ");
         // Serial.print(bodyOrientation.x);
@@ -112,12 +114,16 @@ void loop() {
         // Serial.print(bodyOrientation.y);
         // Serial.println();
 
+        // Serial.print("Touching ground? ");
+        // Serial.print(leg.isFootTouchingGround());
+        // Serial.println();
+        // leg.isFootTouchingGround();
         // float val1 = -25.0 * sin(millis() / 100.0);
         // float val1 = -100.0 - 25.0 * sin(millis() / 1000.0);
 
-        float theta1;
-        float theta2;
-        float theta3;
+        // float theta1;
+        // float theta2;
+        // float theta3;
 
         // leg.setDesiredAlphaXYInDeg(0, 0, bodyOrientation.x, 0);
 

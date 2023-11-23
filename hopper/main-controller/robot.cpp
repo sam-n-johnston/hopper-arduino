@@ -10,7 +10,7 @@ void Robot::begin() {
 
 void Robot::updateStateIfChanged() {
     if (this->currentState == STANCE_GOING_DOWN &&
-        millis() - this->lastStateChangeTime > 10) {
+        millis() - this->lastStateChangeTime > 61) {
         Serial.println("STANCE_GOING_UP...");
         this->currentState = STANCE_GOING_UP;
         this->lastStateChangeTime = millis();
@@ -45,18 +45,18 @@ int Robot::getCurrentState() { return this->currentState; }
 
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY) {
-    // switch (this->currentState) {
-    // case STANCE_GOING_DOWN:
-    this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
-    // case STANCE_GOING_UP:
-    //     // TODO: push hard
-    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
+    switch (this->currentState) {
+    case STANCE_GOING_DOWN:
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
+    case STANCE_GOING_UP:
+        // TODO: push hard
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
 
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(
@@ -66,29 +66,29 @@ void Robot::sendCommandsToMotorsDuringFlight(
     float bodyOrientationY,
     float bodyOrientationXDot,
     float bodyOrientationYDot) {
-    // switch (this->currentState) {
-    // case FLIGHT_GOING_UP:
-    this->moveLegForDesiredHorizontalSpeed(
-        xd,
-        yd,
-        bodyOrientationX,
-        bodyOrientationY,
-        bodyOrientationXDot,
-        bodyOrientationYDot);
-    // break;
-    // case FLIGHT_GOING_DOWN:
-    //     this->moveLegForDesiredHorizontalSpeed(
-    //         xd,
-    //         yd,
-    //         bodyOrientationX,
-    //         bodyOrientationY,
-    //         bodyOrientationXDot,
-    //         bodyOrientationYDot);
-    //     break;
+    switch (this->currentState) {
+    case FLIGHT_GOING_UP:
+        this->moveLegForDesiredHorizontalSpeed(
+            xd,
+            yd,
+            bodyOrientationX,
+            bodyOrientationY,
+            bodyOrientationXDot,
+            bodyOrientationYDot);
+        break;
+    case FLIGHT_GOING_DOWN:
+        this->moveLegForDesiredHorizontalSpeed(
+            xd,
+            yd,
+            bodyOrientationX,
+            bodyOrientationY,
+            bodyOrientationXDot,
+            bodyOrientationYDot);
+        break;
 
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
 void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY) {
