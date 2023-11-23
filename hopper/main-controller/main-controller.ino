@@ -38,7 +38,7 @@ void setup() {
 
     Wire.setClock(1000000);
 
-    leg.setFootPosition(0, 0, -100);
+    leg.setFootPosition(0, 0, -60);
 
     Serial.println("Setup Done");
 }
@@ -92,20 +92,20 @@ void loop() {
             }
         }
 
-        // robot.updateStateIfChanged();
+        robot.updateStateIfChanged();
         // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
         //     robot.getCurrentState() == STANCE_GOING_UP) {
 
         robot.sendCommandsToDuringStance(bodyOrientation.x, bodyOrientation.y);
         // } else {
 
-        //     robot.sendCommandsToMotorsDuringFlight(
-        //         linearVelocity.x,
-        //         linearVelocity.y,
-        //         bodyOrientation.x,
-        //         bodyOrientation.y,
-        //         angularVelocity.x,
-        //         angularVelocity.y);
+        robot.sendCommandsToMotorsDuringFlight(
+            linearVelocity.x,
+            linearVelocity.y,
+            bodyOrientation.x,
+            bodyOrientation.y,
+            angularVelocity.x,
+            angularVelocity.y);
         // }
 
         // Serial.print("Got orientation - x: ");

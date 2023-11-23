@@ -45,22 +45,19 @@ int Robot::getCurrentState() { return this->currentState; }
 
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY) {
-    // switch (this->currentState) {
-    // case STANCE_GOING_DOWN:
-    if (millis() > 2000)
-        this->leg->setPushFactor(1.2);
-    else
+    switch (this->currentState) {
+    case STANCE_GOING_DOWN:
         this->leg->setPushFactor(1.0);
-    this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
-    // case STANCE_GOING_UP:
-    //     this->leg->setPushFactor(1.2);
-    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
+    case STANCE_GOING_UP:
+        this->leg->setPushFactor(1.2);
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
 
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(

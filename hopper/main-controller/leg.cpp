@@ -35,7 +35,8 @@ void Leg::setFootPosition(float x, float y, float z) {
     float theta2;
     float theta3;
 
-    int status = delta_calcInverse(x, y, z, theta1, theta2, theta3);
+    int status = delta_calcInverse(
+        x * pushFactor, y * pushFactor, z * pushFactor, theta1, theta2, theta3);
 
     // Check if angles are NaN
     if (status != 0 || theta1 != theta1 || theta2 != theta2 || theta3 != theta3)
@@ -82,32 +83,16 @@ float Leg::getAlphaYInDeg() {
 }
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
-    float desiredGoal = goalFootExtension * this->pushFactor;
+    // float desiredGoal = goalFootExtension * this->pushFactor;
 
-    float newY = sin(degX * degToRad) * desiredGoal;
+    float newY = sin(degX * degToRad) * goalFootExtension;
 
     float projectedGoalFootExtensionX =
-        sqrt(desiredGoal * desiredGoal - newY * newY);
+        sqrt(goalFootExtension * goalFootExtension - newY * newY);
 
     float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX;
-    float newZ = -sqrt(desiredGoal * desiredGoal - newY * newY - newX * newX);
-
-    setFootPosition(newX, newY, newZ);
-}
-
-void Leg::setDesiredAlphaXYInDeg(
-    float degX, float degY, float alphaXDeg, float alphaYDeg) {
-    float desiredGoal = goalFootExtension * this->pushFactor;
-
-    float newY = sin(degX * degToRad) * desiredGoal -
-                 sin(alphaXDeg * degToRad) * footLengthInMM;
-
-    float projectedGoalFootExtensionX =
-        sqrt(desiredGoal * desiredGoal - newY * newY);
-
-    float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX +
-                 sin(alphaYDeg * degToRad) * footLengthInMM;
-    float newZ = -sqrt(desiredGoal * desiredGoal - newY * newY - newX * newX);
+    float newZ = -sqrt(
+        goalFootExtension * goalFootExtension - newY * newY - newX * newX);
 
     // Serial.print("x");
     // Serial.print(newX);
@@ -116,6 +101,24 @@ void Leg::setDesiredAlphaXYInDeg(
     // Serial.print("z");
     // Serial.print(newZ);
     // Serial.println("");
+
+    setFootPosition(newX, newY, newZ);
+}
+
+void Leg::setDesiredAlphaXYInDeg(
+    float degX, float degY, float alphaXDeg, float alphaYDeg) {
+    // float desiredGoal = goalFootExtension * this->pushFactor;
+
+    float newY = sin(degX * degToRad) * goalFootExtension -
+                 sin(alphaXDeg * degToRad) * footLengthInMM;
+
+    float projectedGoalFootExtensionX =
+        sqrt(goalFootExtension * goalFootExtension - newY * newY);
+
+    float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX +
+                 sin(alphaYDeg * degToRad) * footLengthInMM;
+    float newZ = -sqrt(
+        goalFootExtension * goalFootExtension - newY * newY - newX * newX);
 
     setFootPosition(newX, newY, newZ);
 }
