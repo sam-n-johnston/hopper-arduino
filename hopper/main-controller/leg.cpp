@@ -17,6 +17,8 @@ void Leg::setFootPosition(Vector position) {
     setFootPosition(position.x, position.y, position.z);
 }
 
+void Leg::setPushFactor(float pushFactor) { this->pushFactor = pushFactor; }
+
 void Leg::setFootPosition(float x, float y, float z) {
     float goalX = x;
     float goalY = y;
@@ -38,11 +40,10 @@ void Leg::setFootPosition(float x, float y, float z) {
     // Check if angles are NaN
     if (status != 0 || theta1 != theta1 || theta2 != theta2 || theta3 != theta3)
         Serial.println("Failed to calculate inverse kinematics");
-    else {
-        this->servo1->setPositionInDeg(-theta1);
-        this->servo2->setPositionInDeg(-theta2);
-        this->servo3->setPositionInDeg(-theta3);
-    }
+
+    this->servo1->setPositionInDeg(-theta1);
+    this->servo2->setPositionInDeg(-theta2);
+    this->servo3->setPositionInDeg(-theta3);
 }
 
 Vector Leg::getFootPosition() {
@@ -65,8 +66,6 @@ Vector Leg::getFootPosition() {
     position.y = y;
     position.z = z;
 
-    footExtension = sqrt(x * x + y * y + z * z);
-
     return position;
 }
 
@@ -83,30 +82,40 @@ float Leg::getAlphaYInDeg() {
 }
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
-    float newY = sin(degX * degToRad) * goalFootExtension;
+    float desiredGoal = goalFootExtension * this->pushFactor;
+
+    float newY = sin(degX * degToRad) * desiredGoal;
 
     float projectedGoalFootExtensionX =
-        sqrt(goalFootExtension * goalFootExtension - newY * newY);
+        sqrt(desiredGoal * desiredGoal - newY * newY);
 
     float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX;
-    float newZ = -sqrt(
-        goalFootExtension * goalFootExtension - newY * newY - newX * newX);
+    float newZ = -sqrt(desiredGoal * desiredGoal - newY * newY - newX * newX);
 
     setFootPosition(newX, newY, newZ);
 }
 
 void Leg::setDesiredAlphaXYInDeg(
     float degX, float degY, float alphaXDeg, float alphaYDeg) {
-    float newY = sin(degX * degToRad) * goalFootExtension -
+    float desiredGoal = goalFootExtension * this->pushFactor;
+
+    float newY = sin(degX * degToRad) * desiredGoal -
                  sin(alphaXDeg * degToRad) * footLengthInMM;
 
     float projectedGoalFootExtensionX =
-        sqrt(goalFootExtension * goalFootExtension - newY * newY);
+        sqrt(desiredGoal * desiredGoal - newY * newY);
 
     float newX = -sin(degY * degToRad) * projectedGoalFootExtensionX +
                  sin(alphaYDeg * degToRad) * footLengthInMM;
-    float newZ = -sqrt(
-        goalFootExtension * goalFootExtension - newY * newY - newX * newX);
+    float newZ = -sqrt(desiredGoal * desiredGoal - newY * newY - newX * newX);
+
+    // Serial.print("x");
+    // Serial.print(newX);
+    // Serial.print("y");
+    // Serial.print(newY);
+    // Serial.print("z");
+    // Serial.print(newZ);
+    // Serial.println("");
 
     setFootPosition(newX, newY, newZ);
 }
@@ -114,8 +123,8 @@ void Leg::setDesiredAlphaXYInDeg(
 bool Leg::isFootTouchingGround() {
     int sensorValue = analogRead(this->footSensorPin);
 
-    // Serial.print("Sensor value: ");
-    // Serial.println(sensorValue);
+    Serial.print("Sensor value: ");
+    Serial.println(sensorValue);
 
     if (sensorValue > 100)
         return true;

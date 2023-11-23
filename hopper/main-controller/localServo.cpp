@@ -85,7 +85,9 @@ void LocalServo::setPositionInDeg(float desiredPosition) {
     float currentPosition = this->getCurrentPosition();
 
     float error = desiredPosition - currentPosition;
-    this->integralError += error * this->deltaTime / 1000.0;
+    float intError = error * this->deltaTime / 1000.0;
+    if (intError == intError)
+        this->integralError += intError;
 
     float output = this->getPIDOutput(error);
 
