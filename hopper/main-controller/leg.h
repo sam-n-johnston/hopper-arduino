@@ -13,7 +13,7 @@ private:
     IServo *servo1;
     IServo *servo2;
     IServo *servo3;
-    int footSensorPin = A1;
+    int footSensorPin = A7;
     float footLengthInMM = 45.0;
     float pushFactor = 1.0;
     float goalFootExtension = 0;
