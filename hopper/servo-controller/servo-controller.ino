@@ -21,19 +21,19 @@
 #include "Wire.h"
 #include <SPI.h>
 
-const int SER2_PWM1 = 9, SER2_PWM2 = 6, SER2_OCM = A1, SER2_DIAG = 4,
-          SER2_EN = 2, SER2_AS5600 = 4;
+const int SER1_PWM1 = 9, SER1_PWM2 = 6, SER1_OCM = A1, SER1_DIAG = 4,
+          SER1_EN = 2, SER1_AS5600 = 4;
 const int SER3_PWM1 = 5, SER3_PWM2 = 3, SER3_OCM = A2, SER3_DIAG = A3,
           SER3_EN = A0, SER3_AS5600 = 6;
 
-Servo servo2 = Servo(
-    SER2_PWM1,
-    SER2_PWM2,
-    SER2_OCM,
-    SER2_DIAG,
-    SER2_EN,
-    SER2_AS5600,
-    3150,
+Servo servo1 = Servo(
+    SER1_PWM1,
+    SER1_PWM2,
+    SER1_OCM,
+    SER1_DIAG,
+    SER1_EN,
+    SER1_AS5600,
+    105,
     true);
 Servo servo3 = Servo(
     SER3_PWM1,
@@ -42,7 +42,7 @@ Servo servo3 = Servo(
     SER3_DIAG,
     SER3_EN,
     SER3_AS5600,
-    1858,
+    841,
     true);
 
 #define COMMAND_SET_GOAL_POSITION1 0
@@ -77,7 +77,7 @@ volatile bool posted = false;
 
 void setup() {
     Serial.begin(115200);
-    servo2.begin();
+    servo1.begin();
     servo3.begin();
     pos = 0;
     readyToProcessData = false;
@@ -117,7 +117,7 @@ ISR(SPI_STC_vect) // Interrupt routine function
         (data == QUERY_GET_POSITION1 || data == QUERY_GET_POSITION3)) {
         // Set current position in memory
         if (data == QUERY_GET_POSITION1)
-            currentPositionThatIsBeingSent = servo2.getMostRecentPosition();
+            currentPositionThatIsBeingSent = servo1.getMostRecentPosition();
         else
             currentPositionThatIsBeingSent = servo3.getMostRecentPosition();
 
@@ -178,14 +178,11 @@ void loop() {
         pos = 0;
     }
 
-    // Serial.print("got position: ");
-    // Serial.println(currentGoalPosition1);
-
     if (torqueOn1)
-        servo2.setPositionInDeg(currentGoalPosition1);
+        servo1.setPositionInDeg(currentGoalPosition1);
     else {
-        servo2.getCurrentPosition();
-        servo2.torqueOff();
+        servo1.getCurrentPosition();
+        servo1.torqueOff();
     }
 
     if (torqueOn3)

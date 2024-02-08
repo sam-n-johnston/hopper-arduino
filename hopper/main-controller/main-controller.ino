@@ -18,7 +18,7 @@ SPIServo servo1 = SPIServo(
     TORQUE_OFF1,
     TORQUE_ON1);
 LocalServo servo2 =
-    LocalServo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, 1030, true);
+    LocalServo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, 326, true);
 SPIServo servo3 = SPIServo(
     SER1_AND_3_CHIP_SELECT_PIN,
     QUERY_GET_POSITION3,

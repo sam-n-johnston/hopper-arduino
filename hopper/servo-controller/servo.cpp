@@ -46,6 +46,9 @@ void Servo::begin() {
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
     int b = as5600.isConnected();
+    float currentPos = this->getCurrentPosition();
+    if (currentPos > 35.0)
+        this->currentTurn--;
 };
 
 float Servo::getCurrentPosition() {
