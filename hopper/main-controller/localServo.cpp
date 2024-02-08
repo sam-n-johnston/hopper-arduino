@@ -36,6 +36,10 @@ void LocalServo::begin() {
     if (b == 0)
         Serial.print("AS5600 failed to connect!");
 
+    float currentPos = this->getCurrentPosition();
+    if (currentPos > 35.0)
+        this->currentTurn--;
+
     Serial.print("Local Servo Setup Done");
 };
 
@@ -75,7 +79,7 @@ void LocalServo::setPositionInDeg(float desiredPosition) {
         if (desiredPosition > 30.0) {
             desiredPosition = 30.0;
         } else {
-            desiredPosition = -90;
+            desiredPosition = -90.0;
         }
     }
 

@@ -46,6 +46,10 @@ void Servo::begin() {
     as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
     int b = as5600.isConnected();
+
+    if (b == 0)
+        Serial.print("AS5600 failed to connect!");
+
     float currentPos = this->getCurrentPosition();
     if (currentPos > 35.0)
         this->currentTurn--;
