@@ -51,7 +51,7 @@ void Robot::sendCommandsToDuringStance(
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
         break;
     case STANCE_GOING_UP:
-        this->leg->setPushFactor(1.2);
+        this->leg->setPushFactor(1.7);
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
         break;
 
@@ -139,8 +139,8 @@ void Robot::moveLegForDesiredHorizontalSpeed(
                  k2 * (bodyOrientationY - thetaDesired) + k3 * (thetaYDot);
 
     // Compute kinematics to gets to x & y desired foot position
-    float alphaXDesired = 0; // asin(xErr / this->footLengthInMM);
-    float alphaYDesired = 0; // asin(yErr / this->footLengthInMM);
+    float alphaXDesired = asin(xErr / this->footLengthInMM);
+    float alphaYDesired = asin(yErr / this->footLengthInMM);
 
     this->leg->setDesiredAlphaXYInDeg(
         alphaXDesired - bodyOrientationX,

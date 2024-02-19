@@ -29,16 +29,21 @@ SPIServo servo3 = SPIServo(
 Leg leg = Leg(&servo1, &servo2, &servo3);
 Robot robot = Robot(&leg);
 
+int size = 175;
+long millisArray[175];
+int positionsArray[175];
+
 void setup() {
     Serial.begin(115200);
     Serial.println("Setup Done");
 
-    robot.begin();
+    // robot.begin();
+    servo2.begin();
     customImu.begin();
 
     Wire.setClock(1000000);
 
-    leg.setFootPosition(0, 0, -60);
+    // leg.setFootPosition(0, 0, -75);
 
     Serial.println("Setup Done");
 }
@@ -46,11 +51,13 @@ void setup() {
 long lastSecond = 0;
 long loops = 0;
 long lastMillisIMU = 0;
+int counter = 0;
+bool printed = false;
 bool robotFell = false;
-Vector bodyOrientation;
-Vector linearAcceleration;
-Vector linearVelocity;
-Vector angularVelocity;
+// Vector bodyOrientation;
+// Vector linearAcceleration;
+// Vector linearVelocity;
+// Vector angularVelocity;
 
 void loop() {
     loops++;
@@ -63,87 +70,31 @@ void loop() {
         loops = 0;
     }
 
-    // if (millis() < 3000)
-    // leg.setFootPosition(0, 0, -100);
-    // leg.getFootPosition();
-    // else
-    // float valX = 15.0 * sin(millis() / 100.0);
-    // float valY = 15.0 * cos(millis() / 100.0);
+    long millisCurr = millis();
 
-    // leg.setDesiredAlphaXYInDeg(valX, valY);
-    // leg.setDesiredAlphaYInDeg(0.0);
-
-    // int pos = servo1.getCurrentPosition();
-
-    // Serial.print("positions: ");
-    // Serial.println(pos);
-
-    if (!robotFell) {
-        if (lastMillisIMU + 50 < currTime) {
-            lastMillisIMU = currTime;
-            bool isFootTouchingGround = leg.isFootTouchingGround();
-
-            if (isFootTouchingGround) {
-                bodyOrientation = customImu.getOrientation();
-            } else {
-                bodyOrientation = customImu.getOrientation();
-                linearVelocity = customImu.getComputedLinearVelocity();
-                angularVelocity = customImu.getAngularVelocity();
+    if (millisCurr < 3000) {
+        servo2.setPositionInDeg(0);
+    } else if (millisCurr < 3060) {
+        if (counter < size) {
+            millisArray[counter] = millisCurr;
+            positionsArray[counter] = servo2.getCurrentPosition();
+            counter++;
+        }
+        servo2.setMotorTorque(-255.0);
+        delay(1);
+        // servo2.setPositionInDeg(-45);
+    } else {
+        if (!printed) {
+            for (int i = 0; i < size; i++) {
+                Serial.print(millisArray[i]);
+                Serial.print(",");
+                Serial.print(positionsArray[i]);
+                Serial.println();
             }
+
+            printed = true;
         }
 
-        robot.updateStateIfChanged();
-        // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-        //     robot.getCurrentState() == STANCE_GOING_UP) {
-
-        robot.sendCommandsToDuringStance(bodyOrientation.x, bodyOrientation.y);
-        // } else {
-
-        robot.sendCommandsToMotorsDuringFlight(
-            linearVelocity.x,
-            linearVelocity.y,
-            bodyOrientation.x,
-            bodyOrientation.y,
-            angularVelocity.x,
-            angularVelocity.y);
-        // }
-
-        // Serial.print("Got orientation - x: ");
-        // Serial.print(bodyOrientation.x);
-        // Serial.print("; y: ");
-        // Serial.print(bodyOrientation.y);
-        // Serial.println();
-
-        // Serial.print("Touching ground? ");
-        // Serial.print(leg.isFootTouchingGround());
-        // Serial.println();
-        // leg.isFootTouchingGround();
-        // float val1 = -25.0 * sin(millis() / 100.0);
-        // float val1 = -100.0 - 25.0 * sin(millis() / 1000.0);
-
-        // float theta1;
-        // float theta2;
-        // float theta3;
-
-        // leg.setDesiredAlphaXYInDeg(0, 0, bodyOrientation.x, 0);
-
-        // int status = delta_calcInverse(30, 0, -100, theta1, theta2, theta3);
-
-        // Serial.print("Got servo 2: ");
-        // Serial.print(theta2);
-        // Serial.print("; Error: ");
-        // Serial.println(-theta2 - servo2.getCurrentPosition());
-        // Serial.println(servo2.getCurrentPosition());
-        // Serial.print(" - ");
-
-        // servo1.setPositionInDeg(-theta1);
-        // servo2.setPositionInDeg(-theta2);
-        // servo3.setPositionInDeg(-theta3);
-
-        // if (robot.hasFallen(customImu.getGravity())) {
-        //     robot.stop();
-        //     robotFell = true;
-        //     Serial.println("Stopping motors because robot fell");
-        // }
+        servo2.torqueOff();
     }
 }

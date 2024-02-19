@@ -126,8 +126,8 @@ void Leg::setDesiredAlphaXYInDeg(
 bool Leg::isFootTouchingGround() {
     int sensorValue = analogRead(this->footSensorPin);
 
-    Serial.print("Sensor value: ");
-    Serial.println(sensorValue);
+    // Serial.print("Sensor value: ");
+    // Serial.println(sensorValue);
 
     if (sensorValue > 100)
         return true;
