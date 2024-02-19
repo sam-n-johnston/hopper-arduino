@@ -30,7 +30,6 @@ private:
     int currentTurn = 0;
     AS5600 as5600;
 
-    void setMotorTorque(float speed);
     float getPIDOutput(float error);
 
 public:
@@ -49,6 +48,7 @@ public:
     void torqueOff();
     float getCurrentPosition();
     float getMostRecentPosition();
+    void setMotorTorque(float speed);
 };
 
 #endif

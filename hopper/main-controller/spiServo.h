@@ -14,6 +14,8 @@
 #define TORQUE_OFF3 0x05
 #define TORQUE_ON1 0x06
 #define TORQUE_ON3 0x07
+#define MAX_TORQUE1 0x08
+#define MAX_TORQUE3 0x09
 
 class SPIServo : public IServo {
 private:

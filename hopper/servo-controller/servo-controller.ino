@@ -53,6 +53,8 @@ Servo servo3 = Servo(
 #define TORQUE_OFF3 5
 #define TORQUE_ON1 6
 #define TORQUE_ON3 7
+#define MAX_TORQUE1 8
+#define MAX_TORQUE3 9
 
 // Change to int when testing 2 bytes.
 byte goalPosition = 0;
@@ -73,6 +75,8 @@ float currentGoalPosition1 = 0.0;
 float currentGoalPosition3 = 0.0;
 bool torqueOn1 = false;
 bool torqueOn3 = false;
+bool maxTorque1 = false;
+bool maxTorque3 = false;
 volatile bool posted = false;
 
 void setup() {
@@ -148,6 +152,16 @@ ISR(SPI_STC_vect) // Interrupt routine function
         return;
     }
 
+    if (pos == 0 && data == MAX_TORQUE2) {
+        maxTorque1 = true;
+        return;
+    }
+
+    if (pos == 0 && data == MAX_TORQUE3) {
+        maxTorque3 = true;
+        return;
+    }
+
     bytes[pos++] = data;
 
     if (pos >= 5) {
@@ -178,16 +192,24 @@ void loop() {
         pos = 0;
     }
 
-    if (torqueOn1)
-        servo1.setPositionInDeg(currentGoalPosition1);
-    else {
+    if (torqueOn1){
+        if (maxTorque1) {
+            servo1.setMotorTorque(-255.0);
+        } else {
+            servo1.setPositionInDeg(currentGoalPosition1);
+        }
+    } else {
         servo1.getCurrentPosition();
         servo1.torqueOff();
     }
 
-    if (torqueOn3)
-        servo3.setPositionInDeg(currentGoalPosition3);
-    else {
+    if (torqueOn3) {
+        if (maxTorque3) {
+            servo3.setMotorTorque(-255.0);
+        } else {
+            servo3.setPositionInDeg(currentGoalPosition3);
+        }
+    } else {
         servo3.getCurrentPosition();
         servo3.torqueOff();
     }
