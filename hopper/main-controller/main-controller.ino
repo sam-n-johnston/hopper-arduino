@@ -1,44 +1,44 @@
-#include "InverseKinematics.h"
-#include "imu.h"
-#include "leg.h"
-#include "localServo.h"
-#include "robot.h"
-#include "spiServo.h"
+// #include "InverseKinematics.h"
+// #include "imu.h"
+// #include "leg.h"
+#include "servo.h"
+// #include "robot.h"
+// #include "spiServo.h"
 
-const int SER2_PWM1 = 3, SER2_PWM2 = 5, SER2_OCM = A0, SER2_DIAG = 7,
-          SER2_EN = 8;
-const int SER1_AND_3_CHIP_SELECT_PIN = 10;
+const int SER1_PWM1 = 5, SER1_PWM2 = 6, SER1_OCM = 26, SER1_DIAG = 4,
+          SER1_EN = 7;
+const int SER2_PWM1 = 9, SER2_PWM2 = 10, SER2_OCM = 27, SER2_DIAG = 8,
+          SER2_EN = 11;
+const int SER3_PWM1 = 21, SER3_PWM2 = 20, SER3_OCM = 26, SER3_DIAG = 22,
+          SER3_EN = 19;
+// const int SER1_AND_3_CHIP_SELECT_PIN = 10;
 
-IMU customImu = IMU();
+// IMU customImu = IMU();
 
-SPIServo servo1 = SPIServo(
-    SER1_AND_3_CHIP_SELECT_PIN,
-    QUERY_GET_POSITION1,
-    COMMAND_SET_GOAL_POSITION1,
-    TORQUE_OFF1,
-    TORQUE_ON1);
-LocalServo servo2 =
-    LocalServo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, 326, true);
-SPIServo servo3 = SPIServo(
-    SER1_AND_3_CHIP_SELECT_PIN,
-    QUERY_GET_POSITION3,
-    COMMAND_SET_GOAL_POSITION3,
-    TORQUE_OFF3,
-    TORQUE_ON3);
+Servo servo1 =
+    Servo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, 326, true);
+Servo servo2 =
+    Servo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, 326, true);
+Servo servo3 =
+    Servo(SER3_PWM1, SER3_PWM2, SER3_OCM, SER3_DIAG, SER3_EN, 326, true);
 
-Leg leg = Leg(&servo1, &servo2, &servo3);
-Robot robot = Robot(&leg);
+// Leg leg = Leg(&servo1, &servo2, &servo3);
+// Robot robot = Robot(&leg);
 
 void setup() {
     Serial.begin(115200);
     Serial.println("Setup Done");
 
-    robot.begin();
-    customImu.begin();
+    // robot.begin();
+    // customImu.begin();
+    servo1.begin();
+    servo2.begin();
+    servo3.begin();
+    // servo2.torqueOn();
 
-    Wire.setClock(1000000);
+    // Wire.setClock(1000000);
 
-    leg.setFootPosition(0, 0, -60);
+    // leg.setFootPosition(0, 0, -60);
 
     Serial.println("Setup Done");
 }
@@ -47,13 +47,14 @@ long lastSecond = 0;
 long loops = 0;
 long lastMillisIMU = 0;
 bool robotFell = false;
-Vector bodyOrientation;
-Vector linearAcceleration;
-Vector linearVelocity;
-Vector angularVelocity;
+// Vector bodyOrientation;
+// Vector linearAcceleration;
+// Vector linearVelocity;
+// Vector angularVelocity;
 
 void loop() {
     loops++;
+    // Serial.print("-0");
     long currTime = millis();
 
     if (lastSecond + 1000 < currTime) {
@@ -62,6 +63,10 @@ void loop() {
         Serial.println(loops);
         loops = 0;
     }
+
+    servo1.setMotorTorque(120);
+    servo2.setMotorTorque(120);
+    servo3.setMotorTorque(120);
 
     // if (millis() < 3000)
     // leg.setFootPosition(0, 0, -100);
@@ -78,34 +83,37 @@ void loop() {
     // Serial.print("positions: ");
     // Serial.println(pos);
 
-    if (!robotFell) {
-        if (lastMillisIMU + 50 < currTime) {
-            lastMillisIMU = currTime;
-            bool isFootTouchingGround = leg.isFootTouchingGround();
+    // if (!robotFell) {
+    //     if (lastMillisIMU + 50 < currTime) {
+    //         lastMillisIMU = currTime;
+    //         bool isFootTouchingGround = leg.isFootTouchingGround();
 
-            if (isFootTouchingGround) {
-                bodyOrientation = customImu.getOrientation();
-            } else {
-                bodyOrientation = customImu.getOrientation();
-                linearVelocity = customImu.getComputedLinearVelocity();
-                angularVelocity = customImu.getAngularVelocity();
-            }
-        }
+    //         if (isFootTouchingGround) {
+    //             bodyOrientation = customImu.getOrientation();
+    //         } else {
+    //             bodyOrientation = customImu.getOrientation();
+    //             linearVelocity = customImu.getComputedLinearVelocity();
+    //             angularVelocity = customImu.getAngularVelocity();
+    //         }
+    //     }
 
-        robot.updateStateIfChanged();
+        // Serial.print("0");
+        // robot.updateStateIfChanged();
         // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
         //     robot.getCurrentState() == STANCE_GOING_UP) {
 
-        robot.sendCommandsToDuringStance(bodyOrientation.x, bodyOrientation.y);
+        // Serial.print("1");
+        // robot.sendCommandsToDuringStance(bodyOrientation.x, bodyOrientation.y);
         // } else {
 
-        robot.sendCommandsToMotorsDuringFlight(
-            linearVelocity.x,
-            linearVelocity.y,
-            bodyOrientation.x,
-            bodyOrientation.y,
-            angularVelocity.x,
-            angularVelocity.y);
+        // Serial.print("1");
+        // robot.sendCommandsToMotorsDuringFlight(
+        //     linearVelocity.x,
+        //     linearVelocity.y,
+        //     bodyOrientation.x,
+        //     bodyOrientation.y,
+        //     angularVelocity.x,
+        //     angularVelocity.y);
         // }
 
         // Serial.print("Got orientation - x: ");
@@ -145,5 +153,5 @@ void loop() {
         //     robotFell = true;
         //     Serial.println("Stopping motors because robot fell");
         // }
-    }
+    // }
 }
