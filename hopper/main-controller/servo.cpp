@@ -1,4 +1,14 @@
 #include "servo.h"
+#define TCAADDR 0x70
+
+void tcaselect(uint8_t i) {
+    if (i > 7)
+        return;
+
+    Wire1.beginTransmission(TCAADDR);
+    Wire1.write(1 << i);
+    Wire1.endTransmission();
+}
 
 Servo::Servo(
     uint8_t PWM1,
@@ -6,6 +16,7 @@ Servo::Servo(
     uint8_t OCM,
     uint8_t DIAG,
     uint8_t EN,
+    uint8_t as5600MultiplexerPin,
     int zeroPosition,
     bool direction) {
     this->PWM1 = PWM1;
@@ -13,11 +24,14 @@ Servo::Servo(
     this->OCM = OCM;
     this->DIAG = DIAG;
     this->EN = EN;
+    this->as5600MultiplexerPin = as5600MultiplexerPin;
     this->zeroPosition = zeroPosition;
     this->direction = direction;
 }
 
 void Servo::begin() {
+    Serial.print("Setting up Servo... ");
+    // Wire1.beginTransmission();
     // Setup gear motor
     pinMode(this->PWM1, OUTPUT);
     pinMode(this->PWM2, OUTPUT);
@@ -27,24 +41,31 @@ void Servo::begin() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
 
-    // Setup encoder
-    // as5600.begin(4);                        //  set direction pin.
-    // as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
+    tcaselect(this->as5600MultiplexerPin);
+    this->as5600 = AS5600(&Wire1);
+    
+    // // // Setup encoder
+    this->as5600.begin(4);                        //  set direction pin.
+    this->as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
-    // int b = as5600.isConnected();
+    int b = as5600.isConnected();
 
-    // if (b == 0)
-    //     Serial.print("AS5600 failed to connect!");
+    if (b == 0)
+        Serial.print("- AS5600 failed to connect! - ");
 
     // float currentPos = this->getCurrentPosition();
     // if (currentPos > 35.0)
     //     this->currentTurn--;
 
-    Serial.print("Local Servo Setup Done");
+    Serial.println("Done");
 };
 
 float Servo::getCurrentPosition() {
-    int encoderAngle = as5600.readAngle();
+    tcaselect(this->as5600MultiplexerPin);
+    int encoderAngle = this->as5600.readAngle();
+
+    // Serial.print("Got this number: ");
+    // Serial.println(encoderAngle);
 
     // Check if there was a turn
     if (this->previousPosition > 4000 && encoderAngle < 100)

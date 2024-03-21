@@ -1,28 +1,27 @@
-// #ifndef IMU_H
-// #define IMU_H
+#ifndef IMU_H
+#define IMU_H
 
-// #include "vector.h"
-// #include <Adafruit_BNO055.h>
-// #include <Adafruit_Sensor.h>
-// #include <SoftwareSerial.h>
-// #include <Wire.h>
+#include "vector.h"
+#include <Adafruit_BNO055.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 
-// class IMU {
-// private:
-//     Adafruit_BNO055 bno;
-//     unsigned long lastAccelerationMeasurementTimeInMs = 0;
-//     Vector lastComputedSpeed;
+class IMU {
+private:
+    Adafruit_BNO055 bno;
+    unsigned long lastAccelerationMeasurementTimeInMs = 0;
+    Vector lastComputedSpeed;
 
-// public:
-//     IMU();
+public:
+    IMU();
 
-//     void begin();
+    void begin();
 
-//     Vector getLinearAcceleration();
-//     Vector getGravity();
-//     Vector getOrientation();
-//     Vector getComputedLinearVelocity();
-//     Vector getAngularVelocity();
-// };
+    Vector getLinearAcceleration();
+    Vector getGravity();
+    Vector getOrientation();
+    Vector getComputedLinearVelocity();
+    Vector getAngularVelocity();
+};
 
-// #endif
+#endif
