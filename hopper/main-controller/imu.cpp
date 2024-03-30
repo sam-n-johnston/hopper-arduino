@@ -2,113 +2,150 @@
 
 IMU::IMU() {}
 
-void IMU::begin() {
+void IMU::begin()
+{
     Serial.println("Starting IMU... ");
-    // Wire.setSDA(0);
-    // Wire.setSCL(1);
-    // Wire.setClock(400000);
-    // Wire.begin();
-    this->bno = Adafruit_BNO055(55, 0x28, &Wire);
-
-    if (!this->bno.begin()) {
-        Serial.println(
-            "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    Wire.setSDA(0);
+    Wire.setSCL(1);
+    if (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire))
+    {
+        Serial.println("Failed to find BNO08x chip");
         while (1)
-            ;
+        {
+            delay(10);
+        }
     }
+
+    setReports();
 
     Serial.println("Done");
 }
 
-Vector IMU::getLinearAcceleration() {
-    sensors_event_t linearAccelData, gravityData;
-    this->bno.getEvent(&linearAccelData, Adafruit_BNO055::VECTOR_LINEARACCEL);
+void IMU::setReports()
+{
 
-    Vector linearAcceleration;
-    linearAcceleration.x = linearAccelData.acceleration.x;
-    linearAcceleration.y = linearAccelData.acceleration.y;
-    linearAcceleration.z = linearAccelData.acceleration.z;
-    unsigned long timeSinceLastMeasurementInMs =
-        millis() - this->lastAccelerationMeasurementTimeInMs;
-
-    this->lastComputedSpeed.x =
-        linearAcceleration.x * timeSinceLastMeasurementInMs;
-    this->lastComputedSpeed.y =
-        linearAcceleration.y * timeSinceLastMeasurementInMs;
-    this->lastComputedSpeed.z =
-        linearAcceleration.z * timeSinceLastMeasurementInMs;
-
-    this->lastAccelerationMeasurementTimeInMs = millis();
-
-    // Serial.print("Got linear accelerations - x: ");
-    // Serial.print(linearAcceleration.x);
-    // Serial.print(", y: ");
-    // Serial.print(linearAcceleration.y);
-    // Serial.print(", z: ");
-    // Serial.print(linearAcceleration.z);
-    // Serial.println();
-
-    return linearAcceleration;
+    if (!bno08x.enableReport(SH2_LINEAR_ACCELERATION))
+    {
+        Serial.println("Could not enable linear acceleration");
+    }
+    if (!bno08x.enableReport(SH2_GRAVITY))
+    {
+        Serial.println("Could not enable gravity vector");
+    }
+    if (!bno08x.enableReport(SH2_GAME_ROTATION_VECTOR))
+    {
+        Serial.println("Could not enable rotation vector");
+    }
+    if (!bno08x.enableReport(SH2_GYROSCOPE_CALIBRATED))
+    {
+        Serial.println("Could not enable gyroscope");
+    }
 }
 
-Vector IMU::getGravity() {
-    sensors_event_t gravityData;
-    bno.getEvent(&gravityData, Adafruit_BNO055::VECTOR_GRAVITY);
+void IMU::getSensorData()
+{
 
-    Vector gravity;
-    gravity.x = -gravityData.acceleration.x;
-    gravity.y = -gravityData.acceleration.y;
-    gravity.z = -gravityData.acceleration.z;
+    if (bno08x.wasReset())
+    {
+        Serial.print("sensor was reset!");
+        setReports();
+    }
 
-    // Serial.print("Got gravity - x: ");
-    // Serial.print(gravity.x);
-    // Serial.print(", y: ");
-    // Serial.print(gravity.y);
-    // Serial.print(", z: ");
-    // Serial.print(gravity.z);
-    // Serial.println();
+    if (!bno08x.getSensorEvent(&sensorValue))
+    {
+        return;
+    }
 
-    return gravity;
+    switch (sensorValue.sensorId)
+    {
+    case SH2_LINEAR_ACCELERATION:
+        lastLinearAcceleration.x = sensorValue.un.linearAcceleration.x;
+        lastLinearAcceleration.y = sensorValue.un.linearAcceleration.y;
+        lastLinearAcceleration.z = sensorValue.un.linearAcceleration.z;
+
+        currentMillis = millis();
+
+        timeSinceLastMeasurementInMs =
+            currentMillis - this->lastAccelerationMeasurementTimeInMs;
+
+        this->lastComputedSpeed.x =
+            lastLinearAcceleration.x * timeSinceLastMeasurementInMs;
+        this->lastComputedSpeed.y =
+            lastLinearAcceleration.y * timeSinceLastMeasurementInMs;
+        this->lastComputedSpeed.z =
+            lastLinearAcceleration.z * timeSinceLastMeasurementInMs;
+
+        this->lastAccelerationMeasurementTimeInMs = currentMillis;
+
+        break;
+    case SH2_GRAVITY:
+        lastGravity.x = sensorValue.un.gravity.x;
+        lastGravity.y = -sensorValue.un.gravity.y;
+        lastGravity.z = -sensorValue.un.gravity.z;
+        break;
+    case SH2_GAME_ROTATION_VECTOR:
+        lastOrientation.x = -sensorValue.un.gameRotationVector.i;
+        lastOrientation.y = sensorValue.un.gameRotationVector.j;
+        lastOrientation.z = sensorValue.un.gameRotationVector.k;
+        break;
+    case SH2_GYROSCOPE_CALIBRATED:
+        lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
+        lastAngularVelocity.y = sensorValue.un.gyroscope.y;
+        lastAngularVelocity.z = sensorValue.un.gyroscope.z;
+        break;
+    }
 }
 
-Vector IMU::getOrientation() {
-    sensors_event_t orientationData;
-    this->bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
-
-    Vector orientation;
-    orientation.x = -orientationData.orientation.y;
-    orientation.y = orientationData.orientation.z;
-    orientation.z = -orientationData.orientation.x;
-
-    Serial.print("Got orientation - x: ");
-    Serial.print(orientation.x);
-    Serial.print(", y: ");
-    Serial.print(orientation.y);
-    Serial.print(", z: ");
-    Serial.print(orientation.z);
+Vector IMU::getLinearAcceleration()
+{
+    Serial.print("Got linear accelerations - x: ");
+    Serial.print(lastLinearAcceleration.x);
+    Serial.print(",\ty: ");
+    Serial.print(lastLinearAcceleration.y);
+    Serial.print(",\tz: ");
+    Serial.print(lastLinearAcceleration.z);
     Serial.println();
 
-    return orientation;
+    return lastLinearAcceleration;
+}
+
+Vector IMU::getGravity()
+{
+    Serial.print("Got lastGravity - x: ");
+    Serial.print(lastGravity.x);
+    Serial.print(", y: ");
+    Serial.print(lastGravity.y);
+    Serial.print(", z: ");
+    Serial.print(lastGravity.z);
+    Serial.println();
+
+    return lastGravity;
+}
+
+Vector IMU::getOrientation()
+{
+    Serial.print("Got lastOrientation - x: ");
+    Serial.print(lastOrientation.x);
+    Serial.print(", y: ");
+    Serial.print(lastOrientation.y);
+    Serial.print(", z: ");
+    Serial.print(lastOrientation.z);
+    Serial.println();
+
+    return lastOrientation;
 }
 
 Vector IMU::getComputedLinearVelocity() { return this->lastComputedSpeed; }
 
-Vector IMU::getAngularVelocity() {
-    sensors_event_t angVelocityData;
-    bno.getEvent(&angVelocityData, Adafruit_BNO055::VECTOR_GYROSCOPE);
+Vector IMU::getAngularVelocity()
+{
+    Serial.print("Got lastAngularVelocity - x: ");
+    Serial.print(lastAngularVelocity.x);
+    Serial.print(",\ty: ");
+    Serial.print(lastAngularVelocity.y);
+    Serial.print(",\tz: ");
+    Serial.print(lastAngularVelocity.z);
+    Serial.println();
 
-    Vector angularVelocity;
-    angularVelocity.x = -angVelocityData.gyro.z;
-    angularVelocity.y = angVelocityData.gyro.y;
-    angularVelocity.z = -angVelocityData.gyro.x;
-
-    // Serial.print("Got angularVelocity - x: ");
-    // Serial.print(angularVelocity.x);
-    // Serial.print(", y: ");
-    // Serial.print(angularVelocity.y);
-    // Serial.print(", z: ");
-    // Serial.print(angularVelocity.z);
-    // Serial.println();
-
-    return angularVelocity;
+    return lastAngularVelocity;
 }

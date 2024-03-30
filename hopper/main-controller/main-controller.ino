@@ -1,6 +1,6 @@
 #include "InverseKinematics.h"
 #include "imu.h"
-// #include "leg.h"
+#include "leg.h"
 #include "servo.h"
 // #include "robot.h"
 // #include "spiServo.h"
@@ -16,13 +16,13 @@ const int SER3_PWM1 = 21, SER3_PWM2 = 20, SER3_OCM = 26, SER3_DIAG = 22,
 IMU customImu = IMU();
 
 Servo servo1 =
-    Servo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, SER1_PLEX, 326, true);
+    Servo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, SER1_PLEX, 448, true);
 Servo servo2 =
-    Servo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_PLEX, 326, true);
+    Servo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_PLEX, 2333, true);
 Servo servo3 =
-    Servo(SER3_PWM1, SER3_PWM2, SER3_OCM, SER3_DIAG, SER3_EN, SER3_PLEX, 326, true);
+    Servo(SER3_PWM1, SER3_PWM2, SER3_OCM, SER3_DIAG, SER3_EN, SER3_PLEX, 922, true);
 
-// Leg leg = Leg(&servo1, &servo2, &servo3);
+Leg leg = Leg(&servo1, &servo2, &servo3);
 // Robot robot = Robot(&leg);
 
 float position1 = 0.0;
@@ -33,18 +33,33 @@ void setup1() {
     delay(2000);
     Serial.begin(115200);
     Serial.println("Starting Core1");
+    customImu.begin();
 }
 
+long lastSecond1 = 0;
+long loops1 = 0;
+
 void loop1() {
-    Serial.print("Servo 1: "); Serial.print(position1); Serial.print(" - ");
-    Serial.print("Servo 2: "); Serial.print(position2); Serial.print(" - ");
-    Serial.print("Servo 3: "); Serial.println(position3);
-    delay(1000);
+    loops1++;
+    long currTime = millis();
+
+    if (lastSecond1 + 1000 < currTime) {
+        lastSecond1 = currTime;
+        Serial.print("Current hz (core 1): ");
+        Serial.println(loops1);
+        loops1 = 0;
+    }
+    // Serial.print("Servo 1: "); Serial.print(position1); Serial.print(" - ");
+    // Serial.print("Servo 2: "); Serial.print(position2); Serial.print(" - ");
+    // Serial.print("Servo 3: "); Serial.println(position3);
+    // Serial.println();
+    customImu.getSensorData();
+    customImu.getAngularVelocity();
 }
 
 void setup() {
     Serial.begin(115200);
-    delay(10000);
+    delay(1000);
     Serial.println("Starting Core0");
     Serial.println("Starting Setup... ");
 
@@ -67,14 +82,12 @@ void setup() {
 
     // robot.begin();
     // customImu.begin();
-    servo1.begin();
-    servo2.begin();
-    servo3.begin();
+    // servo1.begin();
+    // servo2.begin();
+    // servo3.begin();
     // servo2.torqueOn();
 
-    // Wire.setClock(1000000);
-
-    // leg.setFootPosition(0, 0, -60);
+    leg.begin();
 
     Serial.println("Setup Done");
 }
@@ -95,10 +108,13 @@ void loop() {
 
     if (lastSecond + 1000 < currTime) {
         lastSecond = currTime;
-        Serial.print("Current hz: ");
+        Serial.print("Current hz (core 0): ");
         Serial.println(loops);
         loops = 0;
     }
+    float temp = - 20.0 * sin(millis() / 100.0) - 80;
+
+    // leg.setFootPosition(0, 0, temp);
 
     // servo1.setMotorTorque(0);
     // servo2.setMotorTorque(0);
@@ -107,9 +123,9 @@ void loop() {
     // Serial.print("Servo 2: "); Serial.print(servo2.getCurrentPosition()); Serial.print(" - ");
     // Serial.print("Servo 3: "); Serial.println(servo3.getCurrentPosition());
 
-    position1 = servo1.getCurrentPosition();
-    position2 = servo2.getCurrentPosition();
-    position3 = servo3.getCurrentPosition();
+    // position1 = servo1.getCurrentPosition();
+    // position2 = servo2.getCurrentPosition();
+    // position3 = servo3.getCurrentPosition();
 
     // bodyOrientation = customImu.getOrientation();
 
@@ -123,7 +139,7 @@ void loop() {
     // leg.setDesiredAlphaXYInDeg(valX, valY);
     // leg.setDesiredAlphaYInDeg(0.0);
 
-    // int pos = servo1.getCurrentPosition();
+    // servo1.setPositionInDeg(-45.0);
 
     // Serial.print("positions: ");
     // Serial.println(pos);
