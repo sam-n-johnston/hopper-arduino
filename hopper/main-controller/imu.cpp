@@ -84,9 +84,12 @@ void IMU::getSensorData()
         lastGravity.z = -sensorValue.un.gravity.z;
         break;
     case SH2_GAME_ROTATION_VECTOR:
-        lastOrientation.x = -sensorValue.un.gameRotationVector.i;
-        lastOrientation.y = sensorValue.un.gameRotationVector.j;
-        lastOrientation.z = sensorValue.un.gameRotationVector.k;
+        lastOrientation = quaternionToEuler(
+            sensorValue.un.gameRotationVector.real,
+            sensorValue.un.gameRotationVector.i,
+            sensorValue.un.gameRotationVector.j,
+            sensorValue.un.gameRotationVector.k,
+            true);
         break;
     case SH2_GYROSCOPE_CALIBRATED:
         lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
@@ -96,41 +99,64 @@ void IMU::getSensorData()
     }
 }
 
+Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees)
+{
+    float sqr = sq(qr);
+    float sqi = sq(qi);
+    float sqj = sq(qj);
+    float sqk = sq(qk);
+
+    Vector tempVector;
+
+    tempVector.z = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
+    tempVector.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
+    tempVector.x = -atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+
+    if (degrees)
+    {
+        tempVector.x *= RAD_TO_DEG;
+        tempVector.y *= RAD_TO_DEG;
+        tempVector.z *= RAD_TO_DEG;
+    }
+
+    return tempVector;
+}
+
 Vector IMU::getLinearAcceleration()
 {
-    Serial.print("Got linear accelerations - x: ");
-    Serial.print(lastLinearAcceleration.x);
-    Serial.print(",\ty: ");
-    Serial.print(lastLinearAcceleration.y);
-    Serial.print(",\tz: ");
-    Serial.print(lastLinearAcceleration.z);
-    Serial.println();
+    // Serial.print("Got linear accelerations - x: ");
+    // Serial.print(lastLinearAcceleration.x);
+    // Serial.print(",\ty: ");
+    // Serial.print(lastLinearAcceleration.y);
+    // Serial.print(",\tz: ");
+    // Serial.print(lastLinearAcceleration.z);
+    // Serial.println();
 
     return lastLinearAcceleration;
 }
 
 Vector IMU::getGravity()
 {
-    Serial.print("Got lastGravity - x: ");
-    Serial.print(lastGravity.x);
-    Serial.print(", y: ");
-    Serial.print(lastGravity.y);
-    Serial.print(", z: ");
-    Serial.print(lastGravity.z);
-    Serial.println();
+    // Serial.print("Got lastGravity - x: ");
+    // Serial.print(lastGravity.x);
+    // Serial.print(", y: ");
+    // Serial.print(lastGravity.y);
+    // Serial.print(", z: ");
+    // Serial.print(lastGravity.z);
+    // Serial.println();
 
     return lastGravity;
 }
 
 Vector IMU::getOrientation()
 {
-    Serial.print("Got lastOrientation - x: ");
-    Serial.print(lastOrientation.x);
-    Serial.print(", y: ");
-    Serial.print(lastOrientation.y);
-    Serial.print(", z: ");
-    Serial.print(lastOrientation.z);
-    Serial.println();
+    // Serial.print("Got lastOrientation - x: ");
+    // Serial.print(lastOrientation.x);
+    // Serial.print(", y: ");
+    // Serial.print(lastOrientation.y);
+    // Serial.print(", z: ");
+    // Serial.print(lastOrientation.z);
+    // Serial.println();
 
     return lastOrientation;
 }
@@ -139,13 +165,13 @@ Vector IMU::getComputedLinearVelocity() { return this->lastComputedSpeed; }
 
 Vector IMU::getAngularVelocity()
 {
-    Serial.print("Got lastAngularVelocity - x: ");
-    Serial.print(lastAngularVelocity.x);
-    Serial.print(",\ty: ");
-    Serial.print(lastAngularVelocity.y);
-    Serial.print(",\tz: ");
-    Serial.print(lastAngularVelocity.z);
-    Serial.println();
+    // Serial.print("Got lastAngularVelocity - x: ");
+    // Serial.print(lastAngularVelocity.x);
+    // Serial.print(",\ty: ");
+    // Serial.print(lastAngularVelocity.y);
+    // Serial.print(",\tz: ");
+    // Serial.print(lastAngularVelocity.z);
+    // Serial.println();
 
     return lastAngularVelocity;
 }

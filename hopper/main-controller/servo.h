@@ -20,6 +20,7 @@ private:
     int positionDelta = 0;
     unsigned long previousPositionTime = 0;
     int deltaTime = 0;
+    float desiredPosition = 0.0;
     float integralError = 0.0;
     float previousError = 0.0;
     int currentTurn = 0;
@@ -41,6 +42,7 @@ public:
     void setMotorTorque(float speed);
     void begin();
     void setPositionInDeg(float deg);
+    void goToDesiredPosition();
     void torqueOn();
     void torqueOff();
     float getCurrentPosition();

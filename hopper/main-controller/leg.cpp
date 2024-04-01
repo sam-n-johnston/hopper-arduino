@@ -28,8 +28,16 @@ void Leg::setFootPosition(float x, float y, float z) {
         sqrt(goalX * goalX + goalY * goalY + goalZ * goalZ);
 
     // check if it's a NaN
-    if (tempGoalFootExtension == tempGoalFootExtension)
+    if (tempGoalFootExtension == tempGoalFootExtension) {
         goalFootExtension = tempGoalFootExtension;
+        // Serial.print("Foot extension - x: ");
+        // Serial.print(goalX);
+        // Serial.print("\ty:");
+        // Serial.print(y);
+        // Serial.print("\tz:");
+        // Serial.println(z);
+        // Serial.print("tempGoalFootExtension is NaN");
+    }
 
     float theta1;
     float theta2;
@@ -46,6 +54,12 @@ void Leg::setFootPosition(float x, float y, float z) {
         this->servo2->setPositionInDeg(0);
         this->servo3->setPositionInDeg(0);
     } else {
+        // Serial.print("Setting positions - 1: ");
+        // Serial.print(-theta1);
+        // Serial.print("\t2:");
+        // Serial.print(-theta2);
+        // Serial.print("\t3:");
+        // Serial.println(-theta3);
         this->servo1->setPositionInDeg(-theta1);
         this->servo2->setPositionInDeg(-theta2);
         this->servo3->setPositionInDeg(-theta3);
@@ -125,6 +139,16 @@ void Leg::setDesiredAlphaXYInDeg(
                  sin(alphaYDeg * degToRad) * footLengthInMM;
     float newZ = -sqrt(
         goalFootExtension * goalFootExtension - newY * newY - newX * newX);
+
+    // BAD = These values aren't degrees.
+    // Serial.print("X: ");
+    // Serial.print(degX);
+    // Serial.print("\tNewY: ");
+    // Serial.print(newY);
+    // Serial.print("\tNewX: ");
+    // Serial.print(newX);
+    // Serial.print("\tNewZ: ");
+    // Serial.println(newZ);
 
     setFootPosition(newX, newY, newZ);
 }

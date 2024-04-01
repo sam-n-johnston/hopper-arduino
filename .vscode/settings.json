@@ -18,6 +18,7 @@
         "ostream": "cpp",
         "*.tcc": "cpp",
         "chrono": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "complex": "cpp"
     }
 }

@@ -2,8 +2,7 @@
 #include "imu.h"
 #include "leg.h"
 #include "servo.h"
-// #include "robot.h"
-// #include "spiServo.h"
+#include "robot.h"
 
 const int SER1_PWM1 = 5, SER1_PWM2 = 6, SER1_OCM = 26, SER1_DIAG = 4,
           SER1_PLEX = 0, SER1_EN = 7;
@@ -16,24 +15,35 @@ const int SER3_PWM1 = 21, SER3_PWM2 = 20, SER3_OCM = 26, SER3_DIAG = 22,
 IMU customImu = IMU();
 
 Servo servo1 =
-    Servo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, SER1_PLEX, 448, true);
+    Servo(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, SER1_PLEX, 479, true);
 Servo servo2 =
-    Servo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_PLEX, 2333, true);
+    Servo(SER2_PWM1, SER2_PWM2, SER2_OCM, SER2_DIAG, SER2_EN, SER2_PLEX, 905, true);
 Servo servo3 =
-    Servo(SER3_PWM1, SER3_PWM2, SER3_OCM, SER3_DIAG, SER3_EN, SER3_PLEX, 922, true);
+    Servo(SER3_PWM1, SER3_PWM2, SER3_OCM, SER3_DIAG, SER3_EN, SER3_PLEX, 2345, true);
 
 Leg leg = Leg(&servo1, &servo2, &servo3);
-// Robot robot = Robot(&leg);
+Robot robot = Robot(&leg);
 
 float position1 = 0.0;
 float position2 = 0.0;
 float position3 = 0.0;
 
 void setup1() {
-    delay(2000);
     Serial.begin(115200);
     Serial.println("Starting Core1");
+
+    bool test1 = Wire.setSCL(1);
+    bool test2 = Wire.setSDA(0);
+
+    bool test3 = Wire1.setSDA(2);
+    bool test4 = Wire1.setSCL(3);
+
+    Wire.begin();
+    Wire1.begin();
+
     customImu.begin();
+    robot.begin();
+    leg.setFootPosition(0.0, 0.0, -100);
 }
 
 long lastSecond1 = 0;
@@ -49,47 +59,28 @@ void loop1() {
         Serial.println(loops1);
         loops1 = 0;
     }
-    // Serial.print("Servo 1: "); Serial.print(position1); Serial.print(" - ");
-    // Serial.print("Servo 2: "); Serial.print(position2); Serial.print(" - ");
-    // Serial.print("Servo 3: "); Serial.println(position3);
-    // Serial.println();
+
     customImu.getSensorData();
-    customImu.getAngularVelocity();
+    Vector bodyOrientation = customImu.getOrientation();
+
+    // leg.setFootPosition(0, 0, -100);
+    // servo1.setPositionInDeg(0.0);
+    // servo2.setPositionInDeg(0.0);
+    // servo3.setPositionInDeg(0.0);
+
+    robot.sendCommandsToMotorsDuringFlight(
+            0.0,
+            0.0,
+            bodyOrientation.x,
+            bodyOrientation.y,
+            0.0,
+            0.0);
 }
 
 void setup() {
     Serial.begin(115200);
-    delay(1000);
     Serial.println("Starting Core0");
-    Serial.println("Starting Setup... ");
-
-    bool test1 = Wire.setSCL(1);
-    bool test2 = Wire.setSDA(0);
-
-    // pinMode(2, OUTPUT);
-    // pinMode(3, OUTPUT);
-
-    bool test3 = Wire1.setSDA(2);
-    bool test4 = Wire1.setSCL(3);
-
-    // Serial.print("Test 1: ");
-    // Serial.print(test1);
-    // Serial.print(" - Test 2: ");
-    // Serial.println(test2);
-    // Wire1.setClock(400000);
-    Wire.begin();
-    Wire1.begin();
-
-    // robot.begin();
-    // customImu.begin();
-    // servo1.begin();
-    // servo2.begin();
-    // servo3.begin();
-    // servo2.torqueOn();
-
-    leg.begin();
-
-    Serial.println("Setup Done");
+    delay(1000);
 }
 
 long lastSecond = 0;
@@ -112,7 +103,11 @@ void loop() {
         Serial.println(loops);
         loops = 0;
     }
-    float temp = - 20.0 * sin(millis() / 100.0) - 80;
+    // float temp = - 20.0 * sin(millis() / 100.0) - 80;
+
+    servo1.goToDesiredPosition();
+    servo2.goToDesiredPosition();
+    servo3.goToDesiredPosition();
 
     // leg.setFootPosition(0, 0, temp);
 
@@ -164,7 +159,6 @@ void loop() {
         //     robot.getCurrentState() == STANCE_GOING_UP) {
 
         // Serial.print("1");
-        // robot.sendCommandsToDuringStance(bodyOrientation.x, bodyOrientation.y);
         // } else {
 
         // Serial.print("1");

@@ -60,6 +60,33 @@ void Servo::begin() {
     Serial.println("Done");
 };
 
+void Servo::goToDesiredPosition() {
+    if (desiredPosition > 30.0 || desiredPosition < -90.0) {
+        if (desiredPosition > 30.0) {
+            desiredPosition = 30.0;
+        } else {
+            desiredPosition = -90.0;
+        }
+    }
+
+    unsigned long currentTime = micros();
+    this->deltaTime = currentTime - previousPositionTime;
+
+    float currentPosition = this->getCurrentPosition();
+
+    float error = desiredPosition - currentPosition;
+    float intError = error * this->deltaTime / 1000.0;
+    if (intError == intError)
+        this->integralError += intError;
+
+    float output = this->getPIDOutput(error);
+
+    setMotorTorque(output);
+
+    this->previousPositionTime = currentTime;
+    this->previousError = error;
+}
+
 float Servo::getCurrentPosition() {
     tcaselect(this->as5600MultiplexerPin);
     int encoderAngle = this->as5600.readAngle();
@@ -96,30 +123,7 @@ float Servo::getPIDOutput(float error) {
 }
 
 void Servo::setPositionInDeg(float desiredPosition) {
-    if (desiredPosition > 30.0 || desiredPosition < -90.0) {
-        if (desiredPosition > 30.0) {
-            desiredPosition = 30.0;
-        } else {
-            desiredPosition = -90.0;
-        }
-    }
-
-    unsigned long currentTime = micros();
-    this->deltaTime = currentTime - previousPositionTime;
-
-    float currentPosition = this->getCurrentPosition();
-
-    float error = desiredPosition - currentPosition;
-    float intError = error * this->deltaTime / 1000.0;
-    if (intError == intError)
-        this->integralError += intError;
-
-    float output = this->getPIDOutput(error);
-
-    setMotorTorque(output);
-
-    this->previousPositionTime = currentTime;
-    this->previousError = error;
+    this->desiredPosition = desiredPosition;
 };
 
 void Servo::setMotorTorque(float speed) {

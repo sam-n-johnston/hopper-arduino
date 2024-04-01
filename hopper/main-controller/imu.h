@@ -19,6 +19,7 @@ private:
     unsigned long currentMillis;
     unsigned long timeSinceLastMeasurementInMs;
     void setReports();
+    Vector quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees = false);
 
 public:
     IMU();
