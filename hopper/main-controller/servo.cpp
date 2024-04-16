@@ -143,11 +143,9 @@ void Servo::setMotorTorque(float speed) {
         adjustedSpeed = maxSpeed;
 
     if (speed > 0) {
-        digitalWrite(this->EN, 1);
         digitalWrite(this->PWM1, 0);
         analogWrite(this->PWM2, round(adjustedSpeed));
     } else {
-        digitalWrite(this->EN, 1);
         analogWrite(this->PWM1, round(adjustedSpeed));
         digitalWrite(this->PWM2, 0);
     }

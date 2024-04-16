@@ -12,7 +12,7 @@ private:
     unsigned long lastAccelerationMeasurementTimeInMs = 0;
     Vector lastComputedSpeed;
     Vector lastLinearAcceleration;
-    Vector lastGravity;
+    Vector lastGravity = {x: 0.0, y: 0.0, z: -10.0};
     Vector lastOrientation;
     Vector lastAngularVelocity;
     sh2_SensorValue_t sensorValue;
