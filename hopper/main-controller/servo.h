@@ -3,10 +3,9 @@
 
 #include "AS5600.h"
 #include "Wire.h"
-#include "iServo.h"
 #include <stdint.h>
 
-class Servo : public IServo {
+class Servo {
 private:
     uint8_t PWM1;
     uint8_t PWM2;
@@ -23,10 +22,11 @@ private:
     float desiredPosition = 0.0;
     float integralError = 0.0;
     float previousError = 0.0;
+    float mostRecentPosition = 0.0;
     int currentTurn = 0;
     AS5600 as5600;
-
     float getPIDOutput(float error);
+    float getCurrentPosition();
 
 public:
     Servo(
@@ -45,7 +45,7 @@ public:
     void goToDesiredPosition();
     void torqueOn();
     void torqueOff();
-    float getCurrentPosition();
+    float getMostRecentPosition();
 };
 
 #endif

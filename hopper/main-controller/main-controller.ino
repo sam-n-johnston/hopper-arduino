@@ -54,7 +54,7 @@ void setup1()
 
     customImu.begin();
     robot.begin();
-    leg.setFootPosition(0.0, 0.0, -100);
+    leg.setFootPosition(0.0, 0.0, -100.0);
 }
 
 void loop1()
@@ -147,16 +147,6 @@ void loop()
 
     // leg.setFootPosition(0, 0, temp);
 
-    // servo1.setMotorTorque(0);
-    // servo2.setMotorTorque(0);
-    // servo3.setMotorTorque(0);
-    // Serial.print("Servo 1: "); Serial.print(servo1.getCurrentPosition()); Serial.print(" - ");
-    // Serial.print("Servo 2: "); Serial.print(servo2.getCurrentPosition()); Serial.print(" - ");
-    // Serial.print("Servo 3: "); Serial.println(servo3.getCurrentPosition());
-
-    // position1 = servo1.getCurrentPosition();
-    // position2 = servo2.getCurrentPosition();
-    // position3 = servo3.getCurrentPosition();
 
     // bodyOrientation = customImu.getOrientation();
 

@@ -10,9 +10,9 @@ const float degToRad = 0.0174533;
 
 class Leg {
 private:
-    IServo *servo1;
-    IServo *servo2;
-    IServo *servo3;
+    Servo *servo1;
+    Servo *servo2;
+    Servo *servo3;
     int footSensorPin = 28;
     float footLengthInMM = 45.0;
     float pushFactor = 1.0;
@@ -22,7 +22,7 @@ private:
     float goalZ = -100;
 
 public:
-    Leg(IServo *servo1, IServo *servo2, IServo *servo3);
+    Leg(Servo *servo1, Servo *servo2, Servo *servo3);
 
     void begin();
     void setFootPosition(Vector position);

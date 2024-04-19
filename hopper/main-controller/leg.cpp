@@ -1,7 +1,7 @@
 #include "leg.h"
 #include "InverseKinematics.h"
 
-Leg::Leg(IServo *servo1, IServo *servo2, IServo *servo3) {
+Leg::Leg(Servo *servo1, Servo *servo2, Servo *servo3) {
     this->servo1 = servo1;
     this->servo2 = servo2;
     this->servo3 = servo3;
@@ -71,15 +71,21 @@ Vector Leg::getFootPosition() {
     float x, y, z;
 
     int status = delta_calcForward(
-        -servo1->getCurrentPosition(),
-        -servo2->getCurrentPosition(),
-        -servo3->getCurrentPosition(),
+        -servo1->getMostRecentPosition(),
+        -servo2->getMostRecentPosition(),
+        -servo3->getMostRecentPosition(),
         x,
         y,
         z);
 
-    if (status != 0)
-        Serial.println("Failed to calculate forward kinematics");
+    if (status != 0) {
+        Serial.print("Failed to calculate forward kinematics: ");
+        Serial.print(servo1->getMostRecentPosition());
+        Serial.print(" - ");
+        Serial.print(servo2->getMostRecentPosition());
+        Serial.print(" - ");
+        Serial.println(servo3->getMostRecentPosition());
+    }
 
     Vector position;
 
