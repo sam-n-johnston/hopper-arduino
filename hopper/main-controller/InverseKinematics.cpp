@@ -2,6 +2,7 @@
 
 // Taken from https://hypertriangle.com/~alex/delta-robot-tutorial/
 // robot geometry (look at pics in link above for explanation)
+// Max limits in Z from about -65 to -145
 const float e = 98.73;  // end effector triangle side length
 const float f = 190.53;  // base triangle side length
 const float re = 100.0; // tibia length
