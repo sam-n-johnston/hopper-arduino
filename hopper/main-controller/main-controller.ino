@@ -52,9 +52,10 @@ void setup1()
     Wire.begin();
     Wire1.begin();
 
+    delay(1000);
     customImu.begin();
     robot.begin();
-    leg.setFootPosition(0.0, 0.0, -100.0);
+    leg.setFootPosition(0.0, 0.0, -75.0);
 }
 
 void loop1()
@@ -123,7 +124,7 @@ void setup()
 {
     Serial.begin(115200);
     Serial.println("Starting Core0");
-    delay(1000);
+    delay(5000);
 }
 
 void loop()

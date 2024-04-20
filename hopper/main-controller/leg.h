@@ -19,8 +19,7 @@ private:
     float goalFootExtension = 0;
     float goalX = 0;
     float goalY = 0;
-    float goalZ = -100;
-
+    float goalZ = -75; 
 public:
     Leg(Servo *servo1, Servo *servo2, Servo *servo3);
 
