@@ -48,7 +48,13 @@ void Leg::setFootPosition(float x, float y, float z) {
 
     // Check if angles are NaN
     if (status != 0 || theta1 != theta1 || theta2 != theta2 || theta3 != theta3) {
-        Serial.println("Failed to calculate inverse kinematics");
+        Serial.print("Failed to calculate inverse kinematics - x: ");
+        Serial.print(x * pushFactor);
+        Serial.print(" - y: ");
+        Serial.print(y * pushFactor);
+        Serial.print(" - z: ");
+        Serial.print(z * pushFactor);
+        Serial.println(";");
 
         this->servo1->setPositionInDeg(0);
         this->servo2->setPositionInDeg(0);
