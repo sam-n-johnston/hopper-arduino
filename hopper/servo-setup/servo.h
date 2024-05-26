@@ -39,6 +39,7 @@ public:
         bool direction);
 
     float getCurrentPosition();
+    float getCurrentPositionRaw();
     void setMotorTorque(float speed);
     void begin();
     void setPositionInDeg(float deg);

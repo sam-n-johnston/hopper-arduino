@@ -171,7 +171,7 @@ bool Leg::isFootTouchingGround() {
     // Serial.print("Sensor value: ");
     // Serial.println(sensorValue);
 
-    if (sensorValue < 1000)
+    if (sensorValue > 50)
         return true;
 
     return false;

@@ -10,7 +10,7 @@ void Robot::begin() {
 
 void Robot::updateStateIfChanged() {
     if (this->currentState == STANCE_GOING_DOWN &&
-        millis() - this->lastStateChangeTime > 10000) {
+        millis() - this->lastStateChangeTime > 5 ) {
         Serial.println("STANCE_GOING_UP...");
         this->currentState = STANCE_GOING_UP;
         this->lastStateChangeTime = millis();
@@ -51,7 +51,7 @@ void Robot::sendCommandsToDuringStance(
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
         break;
     case STANCE_GOING_UP:
-        this->leg->setPushFactor(2.0);
+        this->leg->setPushFactor(1.7);
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
         break;
 
@@ -102,7 +102,7 @@ void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY) {
     float alphaDesiredY = alphaY + thetaY;
 
     // Create PD control
-    float kp = 0.1;
+    float kp = 0.5;
 
     /**
      * We want both thetas to be 0 degrees,

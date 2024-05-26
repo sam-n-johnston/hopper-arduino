@@ -7,13 +7,14 @@ void IMU::begin()
     Serial.println("Starting IMU... ");
     Wire.setSDA(0);
     Wire.setSCL(1);
-    if (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire))
+    while (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire))
     {
         Serial.println("Failed to find BNO08x chip");
-        while (1)
-        {
-            delay(10);
-        }
+        delay(100);
+        // while (1)
+        // {
+        //     delay(10);
+        // }
     }
 
     setReports();

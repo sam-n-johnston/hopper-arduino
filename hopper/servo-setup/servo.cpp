@@ -53,13 +53,11 @@ void Servo::begin() {
     this->as5600.begin(4);                        //  set direction pin.
     this->as5600.setDirection(AS5600_CLOCK_WISE); // default, just be explicit.
 
-    int b = as5600.isConnected();
+    // int b = as5600.isConnected();
 
-    if (b == 0) {
-        Serial.print("- AS5600 failed to connect! Retrying... - ");
-        while (1) {
-            delay(10);
-        }
+    while (as5600.isConnected() == 0) {
+        Serial.println("- AS5600 failed to connect! Retrying... - ");
+        delay(1000);
     }
 
     long temp4 = millis();
@@ -105,6 +103,13 @@ void Servo::goToDesiredPosition() {
 
     this->previousPositionTime = currentTime;
     this->previousError = error;
+}
+
+float Servo::getCurrentPositionRaw() {
+    tcaselect(this->as5600MultiplexerPin);
+    int encoderAngle = this->as5600.readAngle();
+
+    return encoderAngle;
 }
 
 float Servo::getCurrentPosition() {
