@@ -21,16 +21,16 @@ Robot robot = Robot(&leg);
 // float position2 = 0.0;
 // float position3 = 0.0;
 bool setupDone = false;
-// bool robotFell = false;
+bool robotFell = false;
 // long lastSecond = 0;
 long lastSecond1 = 0;
 // long loops = 0;
 long loops1 = 0;
-// // long lastMillisIMU = 0;
-// Vector bodyOrientation;
-// Vector linearAcceleration;
-// Vector linearVelocity;
-// Vector angularVelocity;
+long lastMillisIMU = 0;
+Vector bodyOrientation;
+Vector linearAcceleration;
+Vector linearVelocity;
+Vector angularVelocity;
 
 void setup1()
 {
@@ -39,32 +39,32 @@ void setup1()
     Serial.println("Starting Core1");
 
     // For the AS5600
-    // bool test1 = Wire.setSCL(1);
-    // bool test2 = Wire.setSDA(0);
+    bool test2 = Wire1.setSDA(14);
+    bool test1 = Wire1.setSCL(15);
 
-    // // bool test3 = Wire1.setSDA(2);
-    // // bool test4 = Wire1.setSCL(3);
-    // Serial.println("Starting Core1 2");
+    // bool test3 = Wire1.setSDA(2);
+    // bool test4 = Wire1.setSCL(3);
+    Serial.println("Starting Core1 2");
 
-    // // For the IMU
-    // bool test3 = Wire1.setSDA(16);
-    // bool test4 = Wire1.setSCL(17);
+    // For the IMU
+    bool test3 = Wire.setSDA(16);
+    bool test4 = Wire.setSCL(17);
 
-    // if (!test1 || !test2 || !test3 || !test4) {
-    //     Serial.print("Failed to set SDA/SCL: ");
-    //     Serial.print(test1);
-    //     Serial.print(test2);
-    //     Serial.print(test3);
-    //     Serial.print(test4);
-    //     Serial.println();
-    // }
+    if (!test1 || !test2 || !test3 || !test4) {
+        Serial.print("Failed to set SDA/SCL: ");
+        Serial.print(test1);
+        Serial.print(test2);
+        Serial.print(test3);
+        Serial.print(test4);
+        Serial.println();
+    }
     Serial.println("Starting Core1 3");
 
     // Wire.begin();
     // Wire1.begin();
     Serial.println("Starting Core1 4");
 
-    // customImu.begin();
+    customImu.begin();
     robot.begin();
     // leg.setDesiredAlphaXYInDeg(90, 90);
     Serial.println("Starting Core1 5");
@@ -83,60 +83,60 @@ void loop1()
         Serial.println(loops1);
         loops1 = 0;
     }
-    leg.setDesiredAlphaXYInDeg(90, 90);
+    // leg.setDesiredAlphaXYInDeg(90, 90);
 
     // bool isFootTouchingGround = leg.isFootTouchingGround();
     // bodyOrientation = customImu.getOrientation();
 
     // leg.setFootPosition(0.0, 0.0, -100.0);
 
-    // if (lastMillisIMU + 50 < currTime) {
-    //     lastMillisIMU = currTime;
-    // customImu.getSensorData();
-    // }
+    if (lastMillisIMU + 50 < currTime) {
+        lastMillisIMU = currTime;
+        customImu.getSensorData();
+    }
 
-    // if (!robotFell)
-    // {
-    //     bool isFootTouchingGround = leg.isFootTouchingGround();
+    if (!robotFell)
+    {
+        // bool isFootTouchingGround = leg.isFootTouchingGround();
 
-    //     if (isFootTouchingGround)
-    //     {
-    //         bodyOrientation = customImu.getOrientation();
-    //     }
-    //     else
-    //     {
-    //         bodyOrientation = customImu.getOrientation();
-    //         linearVelocity = customImu.getComputedLinearVelocity();
-    //         angularVelocity = customImu.getAngularVelocity();
-    //     }
+        if (false)
+        {
+            bodyOrientation = customImu.getOrientation();
+        }
+        else
+        {
+            bodyOrientation = customImu.getOrientation();
+            linearVelocity = customImu.getComputedLinearVelocity();
+            angularVelocity = customImu.getAngularVelocity();
+        }
 
-    //     robot.updateStateIfChanged();
-    //     if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-    //         robot.getCurrentState() == STANCE_GOING_UP)
-    //     {
-    //         robot.sendCommandsToDuringStance(
-    //             bodyOrientation.x,
-    //             bodyOrientation.y);
-    //     }
-    //     else
-    //     {
-    //         robot.sendCommandsToMotorsDuringFlight(
-    //             linearVelocity.x,
-    //             linearVelocity.y,
-    //             bodyOrientation.x,
-    //             bodyOrientation.y,
-    //             angularVelocity.x,
-    //             angularVelocity.y);
-    //     }
+        // robot.updateStateIfChanged();
+        // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+        //     robot.getCurrentState() == STANCE_GOING_UP)
+        // {
+        //     robot.sendCommandsToDuringStance(
+        //         bodyOrientation.x,
+        //         bodyOrientation.y);
+        // }
+        // else
+        // {
+        //     robot.sendCommandsToMotorsDuringFlight(
+        //         linearVelocity.x,
+        //         linearVelocity.y,
+        //         bodyOrientation.x,
+        //         bodyOrientation.y,
+        //         angularVelocity.x,
+        //         angularVelocity.y);
+        // }
 
-    //     if (robot.hasFallen(customImu.getGravity()))
-    //     {
-    //         Serial.println("Robot fell!");
-    //         robot.stop();
-    //         robotFell = true;
-    //         Serial.println("Stopping motors because robot fell");
-    //     }
-    // }
+        // if (robot.hasFallen(customImu.getGravity()))
+        // {
+        //     Serial.println("Robot fell!");
+        //     robot.stop();
+        //     robotFell = true;
+        //     Serial.println("Stopping motors because robot fell");
+        // }
+    }
 }
 
 void setup()

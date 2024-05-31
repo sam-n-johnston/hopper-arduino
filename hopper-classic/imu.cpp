@@ -5,8 +5,6 @@ IMU::IMU() {}
 void IMU::begin()
 {
     Serial.println("Starting IMU... ");
-    Wire.setSDA(0);
-    Wire.setSCL(1);
     while (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire))
     {
         Serial.println("Failed to find BNO08x chip");
@@ -151,13 +149,13 @@ Vector IMU::getGravity()
 
 Vector IMU::getOrientation()
 {
-    // Serial.print("Got lastOrientation - x: ");
-    // Serial.print(lastOrientation.x);
-    // Serial.print(", y: ");
-    // Serial.print(lastOrientation.y);
-    // Serial.print(", z: ");
-    // Serial.print(lastOrientation.z);
-    // Serial.println();
+    Serial.print("Got lastOrientation - x: ");
+    Serial.print(lastOrientation.x);
+    Serial.print(", y: ");
+    Serial.print(lastOrientation.y);
+    Serial.print(", z: ");
+    Serial.print(lastOrientation.z);
+    Serial.println();
 
     return lastOrientation;
 }
