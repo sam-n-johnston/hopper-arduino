@@ -12,7 +12,9 @@ IMU customImu = IMU();
 Puller puller =
     Puller(SER1_PWM1, SER1_PWM2, SER1_OCM, SER1_DIAG, SER1_EN, SER1_PLEX, 1650, true);
 
-Leg leg = Leg(&puller);
+Servo servoX;
+Servo servoY;
+Leg leg = Leg(&puller, &servoX, &servoY);
 Robot robot = Robot(&leg);
 
 // float position1 = 0.0;
@@ -37,31 +39,35 @@ void setup1()
     Serial.println("Starting Core1");
 
     // For the AS5600
-    bool test1 = Wire.setSCL(1);
-    bool test2 = Wire.setSDA(0);
+    // bool test1 = Wire.setSCL(1);
+    // bool test2 = Wire.setSDA(0);
 
-    // bool test3 = Wire1.setSDA(2);
-    // bool test4 = Wire1.setSCL(3);
+    // // bool test3 = Wire1.setSDA(2);
+    // // bool test4 = Wire1.setSCL(3);
+    // Serial.println("Starting Core1 2");
 
-    // For the IMU
-    bool test3 = Wire1.setSDA(16);
-    bool test4 = Wire1.setSCL(17);
+    // // For the IMU
+    // bool test3 = Wire1.setSDA(16);
+    // bool test4 = Wire1.setSCL(17);
 
-    if (!test1 || !test2 || !test3 || !test4) {
-        Serial.print("Failed to set SDA/SCL: ");
-        Serial.print(test1);
-        Serial.print(test2);
-        Serial.print(test3);
-        Serial.print(test4);
-        Serial.println();
-    }
+    // if (!test1 || !test2 || !test3 || !test4) {
+    //     Serial.print("Failed to set SDA/SCL: ");
+    //     Serial.print(test1);
+    //     Serial.print(test2);
+    //     Serial.print(test3);
+    //     Serial.print(test4);
+    //     Serial.println();
+    // }
+    Serial.println("Starting Core1 3");
 
-    Wire.begin();
-    Wire1.begin();
+    // Wire.begin();
+    // Wire1.begin();
+    Serial.println("Starting Core1 4");
 
-    customImu.begin();
+    // customImu.begin();
     robot.begin();
-    leg.setDesiredAlphaXYInDeg(0.0, 0.0);
+    // leg.setDesiredAlphaXYInDeg(90, 90);
+    Serial.println("Starting Core1 5");
     setupDone = true;
 }
 
@@ -77,7 +83,7 @@ void loop1()
         Serial.println(loops1);
         loops1 = 0;
     }
-    leg.setDesiredAlphaXYInDeg(0.0, 0.0);
+    leg.setDesiredAlphaXYInDeg(90, 90);
 
     // bool isFootTouchingGround = leg.isFootTouchingGround();
     // bodyOrientation = customImu.getOrientation();

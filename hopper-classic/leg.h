@@ -21,7 +21,7 @@ private:
     float goalY = 0;
     float goalZ = -75; 
 public:
-    Leg(Puller *puller);
+    Leg(Puller *puller,  Servo *servoX, Servo *servoY);
 
     void begin();
     // void setFootPosition(Vector position);
