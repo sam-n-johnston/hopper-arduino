@@ -2,36 +2,42 @@
 
 Robot::Robot(Leg *leg) { this->leg = leg; }
 
-void Robot::begin() {
+void Robot::begin()
+{
     this->leg->begin();
     this->leg->torqueOn();
     Serial.println("Robot Setup Done");
 }
 
-void Robot::updateStateIfChanged() {
+void Robot::updateStateIfChanged()
+{
     if (this->currentState == STANCE_GOING_DOWN &&
-        millis() - this->lastStateChangeTime > 5 ) {
+        millis() - this->lastStateChangeTime > 5)
+    {
         Serial.println("STANCE_GOING_UP...");
         this->currentState = STANCE_GOING_UP;
         this->lastStateChangeTime = millis();
         return;
     }
     if (this->currentState == STANCE_GOING_UP &&
-        !this->leg->isFootTouchingGround()) {
+        !this->leg->isFootTouchingGround())
+    {
         Serial.println("FLIGHT_GOING_UP...");
         this->currentState = FLIGHT_GOING_UP;
         this->lastStateChangeTime = millis();
         return;
     }
     if (this->currentState == FLIGHT_GOING_UP &&
-        millis() - this->lastStateChangeTime > 5) {
+        millis() - this->lastStateChangeTime > 5)
+    {
         Serial.println("FLIGHT_GOING_DOWN...");
         this->currentState = FLIGHT_GOING_DOWN;
         this->lastStateChangeTime = millis();
         return;
     }
     if (this->currentState == FLIGHT_GOING_DOWN &&
-        this->leg->isFootTouchingGround()) {
+        this->leg->isFootTouchingGround())
+    {
         Serial.println("STANCE_GOING_DOWN...");
         this->currentState = STANCE_GOING_DOWN;
         this->lastStateChangeTime = millis();
@@ -44,8 +50,10 @@ bool Robot::hasFallen(Vector gravity) { return gravity.z > -8.5; }
 int Robot::getCurrentState() { return this->currentState; }
 
 void Robot::sendCommandsToDuringStance(
-    float bodyOrientationX, float bodyOrientationY) {
-    switch (this->currentState) {
+    float bodyOrientationX, float bodyOrientationY)
+{
+    switch (this->currentState)
+    {
     case STANCE_GOING_DOWN:
         // this->leg->setPushFactor(1.0);
         // this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
@@ -66,35 +74,36 @@ void Robot::sendCommandsToMotorsDuringFlight(
     float bodyOrientationX,
     float bodyOrientationY,
     float bodyOrientationXDot,
-    float bodyOrientationYDot) {
-    // switch (this->currentState) {
-    // case FLIGHT_GOING_UP:
-    //     this->leg->setPushFactor(1.0);
-    //     this->moveLegForDesiredHorizontalSpeed(
-    //         xd,
-    //         yd,
-    //         bodyOrientationX,
-    //         bodyOrientationY,
-    //         bodyOrientationXDot,
-    //         bodyOrientationYDot);
-    //     break;
-    // case FLIGHT_GOING_DOWN:
-    //     this->leg->setPushFactor(1.0);
-    //     this->moveLegForDesiredHorizontalSpeed(
-    //         xd,
-    //         yd,
-    //         bodyOrientationX,
-    //         bodyOrientationY,
-    //         bodyOrientationXDot,
-    //         bodyOrientationYDot);
-    //     break;
+    float bodyOrientationYDot)
+{
+    switch (this->currentState)
+    {
+    case FLIGHT_GOING_UP:
+        this->moveLegForDesiredHorizontalSpeed(
+            xd,
+            yd,
+            bodyOrientationX,
+            bodyOrientationY,
+            bodyOrientationXDot,
+            bodyOrientationYDot);
+        break;
+    case FLIGHT_GOING_DOWN:
+        this->moveLegForDesiredHorizontalSpeed(
+            xd,
+            yd,
+            bodyOrientationX,
+            bodyOrientationY,
+            bodyOrientationXDot,
+            bodyOrientationYDot);
+        break;
 
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
-void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY) {
+void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY)
+{
     // float alphaX = this->leg->getAlphaXInDeg();
     // float alphaY = this->leg->getAlphaYInDeg();
 
@@ -122,7 +131,8 @@ void Robot::moveLegForDesiredHorizontalSpeed(
     float bodyOrientationX,
     float bodyOrientationY,
     float thetaXDot,
-    float thetaYDot) {
+    float thetaYDot)
+{
     // // Create PD control
     // float k1 = 1.0;
     // float k2 = 1.0;
@@ -142,11 +152,9 @@ void Robot::moveLegForDesiredHorizontalSpeed(
     // float alphaXDesired = 0.0; // asin(xErr / this->footLengthInMM);
     // float alphaYDesired = 0.0; // asin(yErr / this->footLengthInMM);
 
-    // this->leg->setDesiredAlphaXYInDeg(
-    //     alphaXDesired - bodyOrientationX,
-    //     alphaYDesired - bodyOrientationY,
-    //     bodyOrientationX,
-    //     bodyOrientationY);
+    this->leg->setDesiredAlphaXYInDeg(
+        -bodyOrientationX,
+        -bodyOrientationY);
 }
 
 void Robot::stop() { leg->torqueOff(); }

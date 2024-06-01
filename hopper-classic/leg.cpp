@@ -8,8 +8,8 @@ Leg::Leg(Puller *puller, Servo *servoX, Servo *servoY) {
 
 void Leg::begin() {
     // this->puller->begin();
-    this->servoX->attach(18, 400, 2600);
-    this->servoY->attach(19, 400, 2600);
+    this->servoX->attach(19, 400, 2600);
+    this->servoY->attach(18, 400, 2600);
 }
 
 // void Leg::setFootPosition(Vector position) {
@@ -40,8 +40,20 @@ void Leg::begin() {
 // }
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
-    this->servoX->write(degX);
-    this->servoY->write(degY);
+    int limit = 30;
+    int limitedPositionX = 90 + degX;
+    int limitedPositionY = 90 + degY;
+    if (limitedPositionX > 90 + limit)
+        limitedPositionX = 90 + limit
+    if (limitedPositionX < 90 - limit)
+        limitedPositionX = 90 - limit
+    if (limitedPositionY > 90 + limit)
+        limitedPositionY = 90 + limit
+    if (limitedPositionY < 90 - limit)
+        limitedPositionY = 90 - limit
+
+    this->servoX->write(limitedPositionX);
+    this->servoY->write(limitedPositionY);
 }
 
 // void Leg::setDesiredAlphaXYInDeg(

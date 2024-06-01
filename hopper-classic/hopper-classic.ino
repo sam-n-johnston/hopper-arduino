@@ -36,15 +36,10 @@ void setup1()
 {
     delay(5000);
     Serial.begin(115200);
-    Serial.println("Starting Core1");
 
     // For the AS5600
     bool test2 = Wire1.setSDA(14);
     bool test1 = Wire1.setSCL(15);
-
-    // bool test3 = Wire1.setSDA(2);
-    // bool test4 = Wire1.setSCL(3);
-    Serial.println("Starting Core1 2");
 
     // For the IMU
     bool test3 = Wire.setSDA(16);
@@ -58,15 +53,9 @@ void setup1()
         Serial.print(test4);
         Serial.println();
     }
-    Serial.println("Starting Core1 3");
-
-    // Wire.begin();
-    // Wire1.begin();
-    Serial.println("Starting Core1 4");
 
     customImu.begin();
     robot.begin();
-    // leg.setDesiredAlphaXYInDeg(90, 90);
     Serial.println("Starting Core1 5");
     setupDone = true;
 }
@@ -86,14 +75,11 @@ void loop1()
     // leg.setDesiredAlphaXYInDeg(90, 90);
 
     // bool isFootTouchingGround = leg.isFootTouchingGround();
-    // bodyOrientation = customImu.getOrientation();
 
-    // leg.setFootPosition(0.0, 0.0, -100.0);
-
-    if (lastMillisIMU + 50 < currTime) {
-        lastMillisIMU = currTime;
+    // if (lastMillisIMU + 50 < currTime) {
+    //     lastMillisIMU = currTime;
         customImu.getSensorData();
-    }
+    // }
 
     if (!robotFell)
     {
@@ -107,7 +93,7 @@ void loop1()
         {
             bodyOrientation = customImu.getOrientation();
             linearVelocity = customImu.getComputedLinearVelocity();
-            angularVelocity = customImu.getAngularVelocity();
+            // angularVelocity = customImu.getAngularVelocity();
         }
 
         // robot.updateStateIfChanged();
@@ -120,13 +106,13 @@ void loop1()
         // }
         // else
         // {
-        //     robot.sendCommandsToMotorsDuringFlight(
-        //         linearVelocity.x,
-        //         linearVelocity.y,
-        //         bodyOrientation.x,
-        //         bodyOrientation.y,
-        //         angularVelocity.x,
-        //         angularVelocity.y);
+            robot.sendCommandsToMotorsDuringFlight(
+                linearVelocity.x,
+                linearVelocity.y,
+                bodyOrientation.x,
+                bodyOrientation.y,
+                angularVelocity.x,
+                angularVelocity.y);
         // }
 
         // if (robot.hasFallen(customImu.getGravity()))

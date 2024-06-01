@@ -5,6 +5,7 @@ IMU::IMU() {}
 void IMU::begin()
 {
     Serial.println("Starting IMU... ");
+    Wire.begin();
     while (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire))
     {
         Serial.println("Failed to find BNO08x chip");
@@ -27,18 +28,18 @@ void IMU::setReports()
     {
         Serial.println("Could not enable linear acceleration");
     }
-    if (!bno08x.enableReport(SH2_GRAVITY))
-    {
-        Serial.println("Could not enable gravity vector");
-    }
+    // if (!bno08x.enableReport(SH2_GRAVITY))
+    // {
+    //     Serial.println("Could not enable gravity vector");
+    // }
     if (!bno08x.enableReport(SH2_GAME_ROTATION_VECTOR))
     {
         Serial.println("Could not enable rotation vector");
     }
-    if (!bno08x.enableReport(SH2_GYROSCOPE_CALIBRATED))
-    {
-        Serial.println("Could not enable gyroscope");
-    }
+    // if (!bno08x.enableReport(SH2_GYROSCOPE_CALIBRATED))
+    // {
+    //     Serial.println("Could not enable gyroscope");
+    // }
 }
 
 void IMU::getSensorData()
@@ -52,6 +53,7 @@ void IMU::getSensorData()
 
     if (!bno08x.getSensorEvent(&sensorValue))
     {
+        Serial.print("No IMU info returned!");
         return;
     }
 
