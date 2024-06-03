@@ -74,14 +74,9 @@ void Puller::findZeroPosition(){
         this->setMotorTorque(50);
         motorCurrent = this->getMotorCurrent();
         currentPosition = this->getCurrentPosition();
-
-        Serial.print("Current1 is: ");
-        Serial.print(motorCurrent);
-        Serial.print("; Position: ");
-        Serial.println(currentPosition);
     }
 
-    // Reset & move forward 2 turns
+    // Reset & move forward
     initialPosition = currentPosition;
     while(
         motorCurrent < 0.75 && 
@@ -107,20 +102,15 @@ void Puller::findZeroPosition(){
         Serial.println(currentPosition);
     }
 
-    Serial.print("DONE: ");
+    this->currentTurn = 0;
+    this->zeroPosition = this->previousPosition;
+
+    Serial.print("Done with average current: ");
     Serial.println(averageCurrent);
     this->torqueOff();
 }
 
 void Puller::goToDesiredPosition() {
-    if (desiredPosition > 30.0 || desiredPosition < -90.0) {
-        if (desiredPosition > 30.0) {
-            desiredPosition = 30.0;
-        } else {
-            desiredPosition = -90.0;
-        }
-    }
-
     unsigned long currentTime = micros();
     this->deltaTime = currentTime - previousPositionTime;
 

@@ -82,6 +82,9 @@ void loop1()
     // customImu.getSensorData();
     // }
 
+    puller.setPositionInDeg(-180);
+    puller.goToDesiredPosition();
+
     if (!robotFell)
     {
         // bool isFootTouchingGround = leg.isFootTouchingGround();
