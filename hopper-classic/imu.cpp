@@ -151,13 +151,13 @@ Vector IMU::getGravity()
 
 Vector IMU::getOrientation()
 {
-    Serial.print("Got lastOrientation - x: ");
-    Serial.print(lastOrientation.x);
-    Serial.print(", y: ");
-    Serial.print(lastOrientation.y);
-    Serial.print(", z: ");
-    Serial.print(lastOrientation.z);
-    Serial.println();
+    // Serial.print("Got lastOrientation - x: ");
+    // Serial.print(lastOrientation.x);
+    // Serial.print(", y: ");
+    // Serial.print(lastOrientation.y);
+    // Serial.print(", z: ");
+    // Serial.print(lastOrientation.z);
+    // Serial.println();
 
     return lastOrientation;
 }

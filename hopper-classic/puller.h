@@ -12,7 +12,6 @@ private:
     uint8_t OCM;
     uint8_t DIAG;
     uint8_t EN;
-    uint8_t as5600MultiplexerPin;
     int zeroPosition = 0;
     bool direction;
     int previousPosition = 0;
@@ -26,6 +25,8 @@ private:
     int currentTurn = 0;
     AS5600 as5600;
     float getPIDOutput(float error);
+    void findZeroPosition();
+    float getMotorCurrent();
 
 public:
     Puller(
@@ -34,8 +35,6 @@ public:
         uint8_t OCM,
         uint8_t DIAG,
         uint8_t EN,
-        uint8_t as5600MultiplexerPin,
-        int zeroPosition,
         bool direction);
 
     float getCurrentPosition();

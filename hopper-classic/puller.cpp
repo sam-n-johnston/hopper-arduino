@@ -1,38 +1,24 @@
 #include "puller.h"
 #define TCAADDR 0x70
 
-void tcaselect(uint8_t i) {
-    if (i > 7)
-        return;
-
-    Wire1.beginTransmission(TCAADDR);
-    Wire1.write(1 << i);
-    Wire1.endTransmission();
-}
-
 Puller::Puller(
     uint8_t PWM1,
     uint8_t PWM2,
     uint8_t OCM,
     uint8_t DIAG,
     uint8_t EN,
-    uint8_t as5600MultiplexerPin,
-    int zeroPosition,
     bool direction) {
     this->PWM1 = PWM1;
     this->PWM2 = PWM2;
     this->OCM = OCM;
     this->DIAG = DIAG;
     this->EN = EN;
-    this->as5600MultiplexerPin = as5600MultiplexerPin;
     this->zeroPosition = zeroPosition;
     this->direction = direction;
 }
 
 void Puller::begin() {
-    Serial.print("Setting up puller with plex pin: ");
-    Serial.print(this->as5600MultiplexerPin);
-    Serial.print("... ");
+    Serial.println("Setting up puller");
 
     // Setup gear motor
     pinMode(this->PWM1, OUTPUT);
@@ -43,7 +29,7 @@ void Puller::begin() {
     digitalWrite(this->PWM1, LOW);
     digitalWrite(this->PWM2, LOW);
 
-    tcaselect(this->as5600MultiplexerPin);
+    Wire1.begin();
     this->as5600 = AS5600(&Wire1);
     
     // Setup encoder
@@ -59,12 +45,72 @@ void Puller::begin() {
         }
     }
 
-    float currentPos = this->getCurrentPosition();
-    if (currentPos > 35.0)
-        this->currentTurn--;
+    findZeroPosition();
 
     Serial.println("Done");
 };
+
+float Puller::getMotorCurrent() {
+    float voltage = analogRead(this->OCM) / 4096.0 * 5; // 5 volt
+    float motorCurrent = voltage / 0.5; // 500mV per amp
+
+    return motorCurrent;
+}
+
+void Puller::findZeroPosition(){
+    this->torqueOn();
+    float initialPosition = this->getCurrentPosition();
+    float currentPosition = initialPosition;
+    Serial.print("Initial position is: ");
+    Serial.print(initialPosition);
+
+    float averageCurrentTotal = 0;
+    float averageCurrent = 0;
+    int numberOfMeasures = 10;
+    float motorCurrent = 0.0;
+
+    // Move back 1 turn
+    while(motorCurrent < 0.75 && abs(currentPosition - initialPosition) < 90.0) {
+        this->setMotorTorque(50);
+        motorCurrent = this->getMotorCurrent();
+        currentPosition = this->getCurrentPosition();
+
+        Serial.print("Current1 is: ");
+        Serial.print(motorCurrent);
+        Serial.print("; Position: ");
+        Serial.println(currentPosition);
+    }
+
+    // Reset & move forward 2 turns
+    initialPosition = currentPosition;
+    while(
+        motorCurrent < 0.75 && 
+        abs(currentPosition - initialPosition) < 360.0 &&
+        (averageCurrent == 0 || motorCurrent < averageCurrent * 1.25)
+    ) {
+        this->setMotorTorque(-50);
+        motorCurrent = this->getMotorCurrent();
+        currentPosition = this->getCurrentPosition();
+
+        if (numberOfMeasures > 0) {
+            averageCurrentTotal += motorCurrent;
+            numberOfMeasures--;
+        }
+
+        if (averageCurrent == 0 && numberOfMeasures == 0) { 
+            averageCurrent = averageCurrentTotal / 10.0;
+        }
+
+        Serial.print("Current2 is: ");
+        Serial.print(motorCurrent);
+        Serial.print("; Position: ");
+        Serial.println(currentPosition);
+    }
+
+    Serial.print("DONE: ");
+    Serial.println(averageCurrent);
+    this->torqueOff();
+}
 
 void Puller::goToDesiredPosition() {
     if (desiredPosition > 30.0 || desiredPosition < -90.0) {
@@ -94,7 +140,6 @@ void Puller::goToDesiredPosition() {
 }
 
 float Puller::getCurrentPosition() {
-    tcaselect(this->as5600MultiplexerPin);
     int encoderAngle = this->as5600.readAngle();
 
     // Serial.print("Got this number: ");
