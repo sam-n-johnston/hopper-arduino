@@ -45,7 +45,7 @@ void Puller::begin() {
         }
     }
 
-    findZeroPosition();
+    // findZeroPosition();
 
     Serial.println("Done");
 };

@@ -24,10 +24,10 @@ void IMU::begin()
 void IMU::setReports()
 {
 
-    if (!bno08x.enableReport(SH2_LINEAR_ACCELERATION))
-    {
-        Serial.println("Could not enable linear acceleration");
-    }
+    // if (!bno08x.enableReport(SH2_LINEAR_ACCELERATION))
+    // {
+    //     Serial.println("Could not enable linear acceleration");
+    // }
     // if (!bno08x.enableReport(SH2_GRAVITY))
     // {
     //     Serial.println("Could not enable gravity vector");
@@ -59,31 +59,31 @@ void IMU::getSensorData()
 
     switch (sensorValue.sensorId)
     {
-    case SH2_LINEAR_ACCELERATION:
-        lastLinearAcceleration.x = sensorValue.un.linearAcceleration.x;
-        lastLinearAcceleration.y = sensorValue.un.linearAcceleration.y;
-        lastLinearAcceleration.z = sensorValue.un.linearAcceleration.z;
+    // case SH2_LINEAR_ACCELERATION:
+    //     lastLinearAcceleration.x = sensorValue.un.linearAcceleration.x;
+    //     lastLinearAcceleration.y = sensorValue.un.linearAcceleration.y;
+    //     lastLinearAcceleration.z = sensorValue.un.linearAcceleration.z;
 
-        currentMillis = millis();
+    //     currentMillis = millis();
 
-        timeSinceLastMeasurementInMs =
-            currentMillis - this->lastAccelerationMeasurementTimeInMs;
+    //     timeSinceLastMeasurementInMs =
+    //         currentMillis - this->lastAccelerationMeasurementTimeInMs;
 
-        this->lastComputedSpeed.x =
-            lastLinearAcceleration.x * timeSinceLastMeasurementInMs;
-        this->lastComputedSpeed.y =
-            lastLinearAcceleration.y * timeSinceLastMeasurementInMs;
-        this->lastComputedSpeed.z =
-            lastLinearAcceleration.z * timeSinceLastMeasurementInMs;
+    //     this->lastComputedSpeed.x =
+    //         lastLinearAcceleration.x * timeSinceLastMeasurementInMs;
+    //     this->lastComputedSpeed.y =
+    //         lastLinearAcceleration.y * timeSinceLastMeasurementInMs;
+    //     this->lastComputedSpeed.z =
+    //         lastLinearAcceleration.z * timeSinceLastMeasurementInMs;
 
-        this->lastAccelerationMeasurementTimeInMs = currentMillis;
+    //     this->lastAccelerationMeasurementTimeInMs = currentMillis;
 
-        break;
-    case SH2_GRAVITY:
-        lastGravity.x = sensorValue.un.gravity.x;
-        lastGravity.y = -sensorValue.un.gravity.y;
-        lastGravity.z = -sensorValue.un.gravity.z;
-        break;
+    //     break;
+    // case SH2_GRAVITY:
+    //     lastGravity.x = sensorValue.un.gravity.x;
+    //     lastGravity.y = -sensorValue.un.gravity.y;
+    //     lastGravity.z = -sensorValue.un.gravity.z;
+    //     break;
     case SH2_GAME_ROTATION_VECTOR:
         lastOrientation = quaternionToEuler(
             sensorValue.un.gameRotationVector.real,
@@ -92,11 +92,11 @@ void IMU::getSensorData()
             sensorValue.un.gameRotationVector.k,
             true);
         break;
-    case SH2_GYROSCOPE_CALIBRATED:
-        lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
-        lastAngularVelocity.y = sensorValue.un.gyroscope.y;
-        lastAngularVelocity.z = sensorValue.un.gyroscope.z;
-        break;
+    // case SH2_GYROSCOPE_CALIBRATED:
+    //     lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
+    //     lastAngularVelocity.y = sensorValue.un.gyroscope.y;
+    //     lastAngularVelocity.z = sensorValue.un.gyroscope.z;
+    //     break;
     }
 }
 

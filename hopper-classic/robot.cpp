@@ -5,7 +5,7 @@ Robot::Robot(Leg *leg) { this->leg = leg; }
 void Robot::begin()
 {
     this->leg->begin();
-    this->leg->torqueOn();
+    // this->leg->torqueOn();
     Serial.println("Robot Setup Done");
 }
 

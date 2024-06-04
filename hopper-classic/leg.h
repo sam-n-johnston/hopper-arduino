@@ -13,7 +13,7 @@ private:
     Puller *puller;
     Servo *servoX;
     Servo *servoY;
-    int footSensorPin = 28;
+    int footSensorPin = 27;
     float footLengthInMM = 45.0;
     float pushFactor = 1.0;
     float goalFootExtension = 0;
@@ -24,13 +24,8 @@ public:
     Leg(Puller *puller,  Servo *servoX, Servo *servoY);
 
     void begin();
-    // void setFootPosition(Vector position);
-    // void setFootPosition(float x, float y, float z);
-    // void setFootPosition(float x, float y, float z);
-    // Vector getFootPosition();
     // float getAlphaXInDeg();
     // float getAlphaYInDeg();
-    // void setPushFactor(float factor);
     void setDesiredAlphaXYInDeg(float degX, float degY);
     void setDesiredAlphaXYInDeg(
         float degX, float degY, float alphaXDeg, float alphaYDeg);

@@ -17,14 +17,11 @@ Servo servoY;
 Leg leg = Leg(&puller, &servoX, &servoY);
 Robot robot = Robot(&leg);
 
-// float position1 = 0.0;
-// float position2 = 0.0;
-// float position3 = 0.0;
 bool setupDone = false;
 bool robotFell = false;
-// long lastSecond = 0;
+long lastSecond = 0;
 long lastSecond1 = 0;
-// long loops = 0;
+long loops = 0;
 long loops1 = 0;
 long lastMillisIMU = 0;
 Vector bodyOrientation;
@@ -73,32 +70,16 @@ void loop1()
         Serial.println(loops1);
         loops1 = 0;
     }
-    // leg.setDesiredAlphaXYInDeg(90, 90);
 
-    // bool isFootTouchingGround = leg.isFootTouchingGround();
+    customImu.getSensorData();
 
-    // if (lastMillisIMU + 50 < currTime) {
-    //     lastMillisIMU = currTime;
-    // customImu.getSensorData();
-    // }
-
-    puller.setPositionInDeg(-180);
-    puller.goToDesiredPosition();
+    // puller.setPositionInDeg(-180);
+    // puller.goToDesiredPosition();
 
     if (!robotFell)
     {
-        // bool isFootTouchingGround = leg.isFootTouchingGround();
-
-        // if (false)
-        // {
-        //     bodyOrientation = customImu.getOrientation();
-        // }
-        // else
-        // {
-        //     bodyOrientation = customImu.getOrientation();
-        //     linearVelocity = customImu.getComputedLinearVelocity();
-        //     // angularVelocity = customImu.getAngularVelocity();
-        // }
+        bool isFootTouchingGround = leg.isFootTouchingGround();
+        bodyOrientation = customImu.getOrientation();
 
         // robot.updateStateIfChanged();
         // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
@@ -142,16 +123,16 @@ void setup()
 
 void loop()
 {
-    //     loops++;
-    //     long currTime = millis();
+        loops++;
+        long currTime = millis();
 
-    //     if (lastSecond + 1000 < currTime)
-    //     {
-    //         lastSecond = currTime;
-    //         Serial.print("Current hz (core 0): ");
-    //         Serial.println(loops);
-    //         loops = 0;
-    //     }
+        if (lastSecond + 1000 < currTime)
+        {
+            lastSecond = currTime;
+            Serial.print("Current hz (core 0): ");
+            Serial.println(loops);
+            loops = 0;
+        }
 
-    //     puller.goToDesiredPosition();
+        puller.goToDesiredPosition();
 }
