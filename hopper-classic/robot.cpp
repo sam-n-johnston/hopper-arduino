@@ -45,7 +45,9 @@ void Robot::updateStateIfChanged()
     }
 }
 
-bool Robot::hasFallen(Vector gravity) { return gravity.z > -8.5; }
+bool Robot::hasFallen(float x, float y) { 
+    return abs(x) > 40.0 || abs(y) > 40.0;
+}
 
 int Robot::getCurrentState() { return this->currentState; }
 
