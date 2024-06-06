@@ -91,13 +91,13 @@ void loop1()
         // }
         // else
         // {
-        // robot.sendCommandsToMotorsDuringFlight(
-        //     linearVelocity.x,
-        //     linearVelocity.y,
-        //     bodyOrientation.x,
-        //     bodyOrientation.y,
-        //     angularVelocity.x,
-        //     angularVelocity.y);
+        //     robot.sendCommandsToMotorsDuringFlight(
+        //         0.0,
+        //         0.0,
+        //         bodyOrientation.x,
+        //         bodyOrientation.y,
+        //         0.0,
+        //         0.0);
         // }
 
         // if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y)
@@ -123,16 +123,16 @@ void setup()
 
 void loop()
 {
-        loops++;
-        long currTime = millis();
+    loops++;
+    long currTime = millis();
 
-        if (lastSecond + 1000 < currTime)
-        {
-            lastSecond = currTime;
-            Serial.print("Current hz (core 0): ");
-            Serial.println(loops);
-            loops = 0;
-        }
+    if (lastSecond + 1000 < currTime)
+    {
+        lastSecond = currTime;
+        Serial.print("Current hz (core 0): ");
+        Serial.println(loops);
+        loops = 0;
+    }
 
-        puller.goToDesiredPosition();
+    puller.goToDesiredPosition();
 }

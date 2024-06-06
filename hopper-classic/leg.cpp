@@ -12,17 +12,23 @@ void Leg::begin() {
     // this->servoY->attach(18, 400, 2600);
 }
 
-// float Leg::getAlphaXInDeg() {
-//     Vector pos = this->getFootPosition();
+/**
+ * @brief 
+ * 
+ * @return float: returns the angle of the leg in relation to the body
+ */
+float Leg::getAlphaXInDeg() {
+    return servoXDesiredPositionDeg;
+}
 
-//     return atan(-pos.y / pos.z);
-// }
-
-// float Leg::getAlphaYInDeg() {
-//     Vector pos = this->getFootPosition();
-
-//     return atan(pos.x / pos.z);
-// }
+/**
+ * @brief 
+ * 
+ * @return float: returns the angle of the leg in relation to the body
+ */
+float Leg::getAlphaYInDeg() {
+    return servoYDesiredPositionDeg;
+}
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
     int limit = 30;
@@ -37,8 +43,19 @@ void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
     if (limitedPositionY < 90 - limit)
         limitedPositionY = 90 - limit;
 
+    servoXDesiredPositionDeg = limitedPositionX;
+    servoYDesiredPositionDeg = limitedPositionY;
+
     this->servoX->write(limitedPositionX);
     this->servoY->write(limitedPositionY);
+}
+
+void Leg::pushDown() {
+    this->puller->setPositionInDeg(360.0);
+}
+
+void Leg::stopPushingDown() {
+    this->puller->setPositionInDeg(0.0);
 }
 
 bool Leg::isFootTouchingGround() {

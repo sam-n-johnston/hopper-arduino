@@ -14,21 +14,18 @@ private:
     Servo *servoX;
     Servo *servoY;
     int footSensorPin = 27;
-    float footLengthInMM = 45.0;
-    float pushFactor = 1.0;
-    float goalFootExtension = 0;
-    float goalX = 0;
-    float goalY = 0;
-    float goalZ = -75; 
+    float servoXDesiredPositionDeg = 0.0;
+    float servoYDesiredPositionDeg = 0.0;
+
 public:
     Leg(Puller *puller,  Servo *servoX, Servo *servoY);
 
     void begin();
-    // float getAlphaXInDeg();
-    // float getAlphaYInDeg();
+    float getAlphaXInDeg();
+    float getAlphaYInDeg();
     void setDesiredAlphaXYInDeg(float degX, float degY);
-    void setDesiredAlphaXYInDeg(
-        float degX, float degY, float alphaXDeg, float alphaYDeg);
+    void pushDown();
+    void stopPushingDown();
     bool isFootTouchingGround();
     void torqueOff();
     void torqueOn();
