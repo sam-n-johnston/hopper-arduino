@@ -33,6 +33,7 @@ void setup1()
 {
     delay(5000);
     Serial.begin(115200);
+    Serial.println("Starting Core1");
 
     // For the AS5600
     bool test2 = Wire1.setSDA(14);
@@ -53,7 +54,7 @@ void setup1()
     }
 
     customImu.begin();
-    robot.begin();
+    // robot.begin();
     Serial.println("Starting Core1 5");
     setupDone = true;
 }
@@ -73,45 +74,46 @@ void loop1()
 
     customImu.getSensorData();
 
-    // puller.setPositionInDeg(-180);
-    // puller.goToDesiredPosition();
+    // // puller.setPositionInDeg(-180);
+    // // puller.goToDesiredPosition();
 
-    if (!robotFell)
-    {
-        bool isFootTouchingGround = leg.isFootTouchingGround();
+    // if (!robotFell)
+    // {
+        // bool isFootTouchingGround = leg.isFootTouchingGround();
         bodyOrientation = customImu.getOrientation();
 
-        // robot.updateStateIfChanged();
-        // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-        //     robot.getCurrentState() == STANCE_GOING_UP)
-        // {
-        //     robot.sendCommandsToDuringStance(
-        //         bodyOrientation.x,
-        //         bodyOrientation.y);
-        // }
-        // else
-        // {
-        //     robot.sendCommandsToMotorsDuringFlight(
-        //         0.0,
-        //         0.0,
-        //         bodyOrientation.x,
-        //         bodyOrientation.y,
-        //         0.0,
-        //         0.0);
-        // }
+    //     robot.updateStateIfChanged();
+    //     if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+    //         robot.getCurrentState() == STANCE_GOING_UP)
+    //     {
+    //         robot.sendCommandsToDuringStance(
+    //             bodyOrientation.x,
+    //             bodyOrientation.y);
+    //     }
+    //     else
+    //     {
+    //         robot.sendCommandsToMotorsDuringFlight(
+    //             0.0,
+    //             0.0,
+    //             bodyOrientation.x,
+    //             bodyOrientation.y,
+    //             0.0,
+    //             0.0);
+    //     }
 
-        // if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y)
-        // {
-        //     Serial.println("Robot fell!");
-        //     robot.stop();
-        //     robotFell = true;
-        //     Serial.println("Stopping motors because robot fell");
-        // }
-    }
+    //     // if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y)
+    //     // {
+    //     //     Serial.println("Robot fell!");
+    //     //     robot.stop();
+    //     //     robotFell = true;
+    //     //     Serial.println("Stopping motors because robot fell");
+    //     // }
+    // }
 }
 
 void setup()
 {
+    delay(4900);
     Serial.begin(115200);
     Serial.println("Starting Core0");
     while (!setupDone)
@@ -134,5 +136,5 @@ void loop()
         loops = 0;
     }
 
-    puller.goToDesiredPosition();
+    // puller.goToDesiredPosition();
 }

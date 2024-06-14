@@ -37,7 +37,7 @@ public:
     void begin();
     void stop();
     void updateStateIfChanged();
-    bool hasFallen(Vector gravity);
+    bool hasFallen(float x, float y);
     int getCurrentState();
     void
     sendCommandsToDuringStance(float legOrientationX, float legOrientationY);

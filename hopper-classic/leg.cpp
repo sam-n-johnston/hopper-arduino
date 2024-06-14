@@ -7,9 +7,9 @@ Leg::Leg(Puller *puller, Servo *servoX, Servo *servoY) {
 }
 
 void Leg::begin() {
-    this->puller->begin();
-    // this->servoX->attach(19, 400, 2600);
-    // this->servoY->attach(18, 400, 2600);
+    // this->puller->begin();
+    this->servoX->attach(19, 400, 2600);
+    this->servoY->attach(18, 400, 2600);
 }
 
 /**
@@ -61,8 +61,8 @@ void Leg::stopPushingDown() {
 bool Leg::isFootTouchingGround() {
     int sensorValue = analogRead(this->footSensorPin);
 
-    Serial.print("Sensor value: ");
-    Serial.println(sensorValue);
+    // Serial.print("Sensor value: ");
+    // Serial.println(sensorValue);
 
     if (sensorValue > 50)
         return true;
@@ -71,13 +71,13 @@ bool Leg::isFootTouchingGround() {
 }
 
 void Leg::torqueOff() {
-    this->puller->torqueOff();
+    // this->puller->torqueOff();
     this->servoX->detach();
     this->servoY->detach();
 }
 
 void Leg::torqueOn() {
-    this->puller->torqueOn();
+    // this->puller->torqueOn();
     this->servoX->attach(19, 400, 2600);
     this->servoY->attach(18, 400, 2600);
 }
