@@ -54,7 +54,7 @@ void setup1()
     }
 
     customImu.begin();
-    // robot.begin();
+    robot.begin();
     Serial.println("Starting Core1 5");
     setupDone = true;
 }
@@ -79,8 +79,8 @@ void loop1()
 
     // if (!robotFell)
     // {
-        // bool isFootTouchingGround = leg.isFootTouchingGround();
-        bodyOrientation = customImu.getOrientation();
+    bool isFootTouchingGround = leg.isFootTouchingGround();
+    bodyOrientation = customImu.getOrientation();
 
     //     robot.updateStateIfChanged();
     //     if (robot.getCurrentState() == STANCE_GOING_DOWN ||
@@ -92,13 +92,13 @@ void loop1()
     //     }
     //     else
     //     {
-    //         robot.sendCommandsToMotorsDuringFlight(
-    //             0.0,
-    //             0.0,
-    //             bodyOrientation.x,
-    //             bodyOrientation.y,
-    //             0.0,
-    //             0.0);
+    robot.sendCommandsToMotorsDuringFlight(
+        0.0,
+        0.0,
+        bodyOrientation.x,
+        bodyOrientation.y,
+        0.0,
+        0.0);
     //     }
 
     //     // if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y)
