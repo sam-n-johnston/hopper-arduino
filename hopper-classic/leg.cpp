@@ -7,7 +7,7 @@ Leg::Leg(Puller *puller, Servo *servoX, Servo *servoY) {
 }
 
 void Leg::begin() {
-    // this->puller->begin();
+    this->puller->begin();
     this->servoX->attach(18, 400, 2600);
     this->servoY->attach(19, 400, 2600);
 }
@@ -31,20 +31,20 @@ float Leg::getAlphaYInDeg() {
 }
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
-    int limit = 30;
-    int limitedPositionX = 90 + degX;
-    int limitedPositionY = 90 + degY;
-    if (limitedPositionX > 90 + limit)
-        limitedPositionX = 90 + limit;
-    if (limitedPositionX < 90 - limit)
-        limitedPositionX = 90 - limit;
-    if (limitedPositionY > 90 + limit)
-        limitedPositionY = 90 + limit;
-    if (limitedPositionY < 90 - limit)
-        limitedPositionY = 90 - limit;
+    float limit = 30.0;
+    float limitedPositionX = 90.0 + degX;
+    float limitedPositionY = 90.0 + degY;
+    if (limitedPositionX > 90.0 + limit)
+        limitedPositionX = 90.0 + limit;
+    if (limitedPositionX < 90.0 - limit)
+        limitedPositionX = 90.0 - limit;
+    if (limitedPositionY > 90.0 + limit)
+        limitedPositionY = 90.0 + limit;
+    if (limitedPositionY < 90.0 - limit)
+        limitedPositionY = 90.0 - limit;
 
-    servoXDesiredPositionDeg = limitedPositionX;
-    servoYDesiredPositionDeg = limitedPositionY;
+    servoXDesiredPositionDeg = limitedPositionX - 90.0;
+    servoYDesiredPositionDeg = limitedPositionY - 90.0;
 
     this->servoX->write(limitedPositionX);
     this->servoY->write(limitedPositionY);
@@ -71,13 +71,13 @@ bool Leg::isFootTouchingGround() {
 }
 
 void Leg::torqueOff() {
-    // this->puller->torqueOff();
+    this->puller->torqueOff();
     this->servoX->detach();
     this->servoY->detach();
 }
 
 void Leg::torqueOn() {
-    // this->puller->torqueOn();
+    this->puller->torqueOn();
     this->servoX->attach(18, 400, 2600);
     this->servoY->attach(19, 400, 2600);
 }

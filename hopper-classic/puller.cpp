@@ -45,7 +45,7 @@ void Puller::begin() {
         }
     }
 
-    // findZeroPosition();
+    findZeroPosition();
 
     Serial.println("Done");
 };
@@ -80,8 +80,8 @@ void Puller::findZeroPosition(){
     initialPosition = currentPosition;
     while(
         motorCurrent < 0.75 && 
-        abs(currentPosition - initialPosition) < 360.0 &&
-        (averageCurrent == 0 || motorCurrent < averageCurrent * 1.25)
+        abs(currentPosition - initialPosition) < 2 * 360.0 &&
+        (averageCurrent == 0 || motorCurrent < averageCurrent * 2.0)
     ) {
         this->setMotorTorque(-50);
         motorCurrent = this->getMotorCurrent();

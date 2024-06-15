@@ -83,22 +83,22 @@ void loop1()
     bodyOrientation = customImu.getOrientation();
 
     //     robot.updateStateIfChanged();
-    //     if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-    //         robot.getCurrentState() == STANCE_GOING_UP)
-    //     {
-    //         robot.sendCommandsToDuringStance(
-    //             bodyOrientation.x,
-    //             bodyOrientation.y);
-    //     }
+        // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+        //     robot.getCurrentState() == STANCE_GOING_UP)
+        // {
+            robot.sendCommandsToDuringStance(
+                bodyOrientation.x,
+                bodyOrientation.y);
+        // }
     //     else
     //     {
-    robot.sendCommandsToMotorsDuringFlight(
-        0.0,
-        0.0,
-        bodyOrientation.x,
-        bodyOrientation.y,
-        0.0,
-        0.0);
+    // robot.sendCommandsToMotorsDuringFlight(
+    //     0.0,
+    //     0.0,
+    //     bodyOrientation.x,
+    //     bodyOrientation.y,
+    //     0.0,
+    //     0.0);
     //     }
 
     //     // if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y)

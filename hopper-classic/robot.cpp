@@ -55,19 +55,19 @@ int Robot::getCurrentState() { return this->currentState; }
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY)
 {
-    switch (this->currentState)
-    {
-    case STANCE_GOING_DOWN:
-        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-        break;
-    case STANCE_GOING_UP:
-        this->leg->pushDown();
-        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-        break;
+    // switch (this->currentState)
+    // {
+    // case STANCE_GOING_DOWN:
+    this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+    //     break;
+    // case STANCE_GOING_UP:
+    //     this->leg->pushDown();
+    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+    //     break;
 
-    default:
-        break;
-    }
+    // default:
+    //     break;
+    // }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(
@@ -106,26 +106,39 @@ void Robot::sendCommandsToMotorsDuringFlight(
 }
 
 /**
- * @brief 
- * 
- * @param thetaX: X Angle in degree of the robot's body
- * @param thetaY: Y Angle in degree of the robot's body
+ * @brief
+ *
+ * @param bodyOrientationX: X Angle in degree of the robot's body
+ * @param bodyOrientationY: Y Angle in degree of the robot's body
  */
-void Robot::moveLegToKeepRobotUpright(float thetaX, float thetaY)
+void Robot::moveLegToKeepRobotUpright(float bodyOrientationX, float bodyOrientationY)
 {
     float alphaX = this->leg->getAlphaXInDeg();
     float alphaY = this->leg->getAlphaYInDeg();
 
     // Create PD control
-    float kp = 0.05;
+    float kp = 0.01;
 
     /**
      * We want both thetas to be 0 degrees,
      * fix only a small percentage of the error
      * on each loop to prevent slippage of the foot
      */
-    float desiredAlphaXRotation = kp * thetaX + alphaX;
-    float desiredAlphaYRotation = kp * thetaY + alphaY;
+    float desiredAlphaXRotation = kp * bodyOrientationX + alphaX;
+    float desiredAlphaYRotation = kp * bodyOrientationY + alphaY;
+
+    // Serial.print("Sending command alphaX: ");
+    // Serial.print(alphaX);
+    // Serial.print("- alphaY: ");
+    // Serial.print(alphaY);
+    // Serial.print("- bodyOrientationX: ");
+    // Serial.print(bodyOrientationX);
+    // Serial.print("- bodyOrientationY: ");
+    // Serial.print(bodyOrientationY);
+    // Serial.print("- X: ");
+    // Serial.print(desiredAlphaXRotation);
+    // Serial.print("- Y: ");
+    // Serial.println(desiredAlphaYRotation);
 
     this->leg->setDesiredAlphaXYInDeg(
         desiredAlphaXRotation, desiredAlphaYRotation);
