@@ -1,20 +1,14 @@
-#include <Servo.h>
-#include "imu.h"
 #include "leg.h"
 #include "puller.h"
 #include "robot.h"
 
 const int PULLER_PWM1 = 12, PULLER_PWM2 = 11, PULLER_OCM = 26, PULLER_DIAG = 13,
-          PULLER_EN = 10;
-
-IMU customImu = IMU();
+          PULLER_EN = 10, PULLER_ZERO_POSITION = 2100;
 
 Puller puller =
-    Puller(PULLER_PWM1, PULLER_PWM2, PULLER_OCM, PULLER_DIAG, PULLER_EN, true);
+    Puller(PULLER_PWM1, PULLER_PWM2, PULLER_OCM, PULLER_DIAG, PULLER_EN, true, PULLER_ZERO_POSITION);
 
-Servo servoX;
-Servo servoY;
-Leg leg = Leg(&puller, &servoX, &servoY);
+Leg leg = Leg(&puller);
 Robot robot = Robot(&leg);
 
 bool setupDone = false;
@@ -53,7 +47,6 @@ void setup1()
         Serial.println();
     }
 
-    customImu.begin();
     robot.begin();
     Serial.println("Starting Core1 5");
     setupDone = true;
@@ -72,42 +65,23 @@ void loop1()
         loops1 = 0;
     }
 
-    customImu.getSensorData();
+    // if (currTime < 10000 ) {
+    //     puller.setPositionInDeg(0);
+    // } else {
+    //     puller.setPositionInDeg(0);
+    // }
 
-    // // puller.setPositionInDeg(-180);
-    // // puller.goToDesiredPosition();
+    // puller.getCurrentPosition();
 
-    if (!robotFell)
+    robot.updateStateIfChanged();
+    if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+        robot.getCurrentState() == STANCE_GOING_UP)
     {
-        bool isFootTouchingGround = leg.isFootTouchingGround();
-        bodyOrientation = customImu.getOrientation();
-
-        robot.updateStateIfChanged();
-        if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-            robot.getCurrentState() == STANCE_GOING_UP)
-        {
-            robot.sendCommandsToDuringStance(
-                bodyOrientation.x,
-                bodyOrientation.y);
-        }
-        else
-        {
-            robot.sendCommandsToMotorsDuringFlight(
-                0.0,
-                0.0,
-                bodyOrientation.x,
-                bodyOrientation.y,
-                0.0,
-                0.0);
-        }
-
-            if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y))
-            {
-                Serial.println("Robot fell!");
-                robot.stop();
-                robotFell = true;
-                Serial.println("Stopping motors because robot fell");
-            }
+        robot.sendCommandsToDuringStance();
+    }
+    else
+    {
+        robot.sendCommandsToMotorsDuringFlight();
     }
 }
 

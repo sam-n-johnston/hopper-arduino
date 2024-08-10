@@ -5,14 +5,14 @@ Robot::Robot(Leg *leg) { this->leg = leg; }
 void Robot::begin()
 {
     this->leg->begin();
-    // this->leg->torqueOn();
+    this->leg->torqueOn();
     Serial.println("Robot Setup Done");
 }
 
 void Robot::updateStateIfChanged()
 {
     if (this->currentState == STANCE_GOING_DOWN &&
-        millis() - this->lastStateChangeTime > 5)
+        millis() - this->lastStateChangeTime > 1)
     {
         Serial.println("STANCE_GOING_UP...");
         this->currentState = STANCE_GOING_UP;
@@ -55,19 +55,19 @@ int Robot::getCurrentState() { return this->currentState; }
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY)
 {
-    // switch (this->currentState)
-    // {
-    // case STANCE_GOING_DOWN:
-    this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
-    // case STANCE_GOING_UP:
-    //     this->leg->pushDown();
-    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
+    switch (this->currentState)
+    {
+    case STANCE_GOING_DOWN:
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
+    case STANCE_GOING_UP:
+        this->leg->pushDown();
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
 
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(

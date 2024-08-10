@@ -7,7 +7,8 @@ Puller::Puller(
     uint8_t OCM,
     uint8_t DIAG,
     uint8_t EN,
-    bool direction) {
+    bool direction,
+    int zeroPosition) {
     this->PWM1 = PWM1;
     this->PWM2 = PWM2;
     this->OCM = OCM;
@@ -45,7 +46,7 @@ void Puller::begin() {
         }
     }
 
-    findZeroPosition();
+    // findZeroPosition();
 
     Serial.println("Done");
 };

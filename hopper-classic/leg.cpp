@@ -51,7 +51,7 @@ void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
 }
 
 void Leg::pushDown() {
-    this->puller->setPositionInDeg(360.0);
+    this->puller->setPositionInDeg(-235.0);
 }
 
 void Leg::stopPushingDown() {
