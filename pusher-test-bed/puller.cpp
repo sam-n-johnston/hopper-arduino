@@ -163,7 +163,7 @@ float Puller::getMostRecentPosition() {
 }
 
 float Puller::getPIDOutput(float error) {
-    float kp = 2.0; // Pc ~140?
+    float kp = 10.0; // Pc ~140?
     float kd = 0.0;
     float ki = 0.0;
 
