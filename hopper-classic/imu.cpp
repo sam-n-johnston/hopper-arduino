@@ -111,7 +111,7 @@ Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk, bool degre
 
     tempVector.z = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
     tempVector.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
-    tempVector.x = -atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+    tempVector.x = atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
 
     if (degrees)
     {
