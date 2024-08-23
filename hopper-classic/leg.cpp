@@ -32,26 +32,34 @@ float Leg::getAlphaYInDeg() {
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
     float limit = 30.0;
-    float limitedPositionX = 90.0 + degX;
-    float limitedPositionY = 90.0 + degY;
-    if (limitedPositionX > 90.0 + limit)
-        limitedPositionX = 90.0 + limit;
-    if (limitedPositionX < 90.0 - limit)
-        limitedPositionX = 90.0 - limit;
-    if (limitedPositionY > 90.0 + limit)
-        limitedPositionY = 90.0 + limit;
-    if (limitedPositionY < 90.0 - limit)
-        limitedPositionY = 90.0 - limit;
+    float xOffset = 1.5;
+    float yOffset = -2.0;
+    float desiredDegX = degX + xOffset;
+    float desiredDegY = degY + yOffset;
 
-    servoXDesiredPositionDeg = limitedPositionX - 90.0;
-    servoYDesiredPositionDeg = limitedPositionY - 90.0;
+    if (desiredDegX > limit)
+        desiredDegX = limit;
+    if (desiredDegX < -limit)
+        desiredDegX = -limit;
+    if (desiredDegY > limit)
+        desiredDegY = limit;
+    if (desiredDegY < -limit)
+        desiredDegY = -limit;
 
-    this->servoX->write(limitedPositionX);
-    this->servoY->write(limitedPositionY);
+    float limitedPositionY = 90.0 + desiredDegY;
+
+    servoXDesiredPositionDeg = desiredDegX;
+    servoYDesiredPositionDeg = desiredDegY;
+
+    // Serial.print("Y: ");
+    // Serial.println(desiredDegY);
+
+    this->servoX->write(90.0 - desiredDegX);
+    this->servoY->write(90.0 + desiredDegY);
 }
 
 void Leg::pushDown() {
-    this->puller->setPositionInDeg(-235.0);
+    this->puller->setPositionInDeg(-85.0);
 }
 
 void Leg::stopPushingDown() {
