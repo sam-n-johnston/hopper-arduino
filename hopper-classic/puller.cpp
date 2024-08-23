@@ -7,7 +7,8 @@ Puller::Puller(
     uint8_t OCM,
     uint8_t DIAG,
     uint8_t EN,
-    bool direction) {
+    bool direction,
+    int zeroPosition) {
     this->PWM1 = PWM1;
     this->PWM2 = PWM2;
     this->OCM = OCM;
@@ -45,7 +46,7 @@ void Puller::begin() {
         }
     }
 
-    findZeroPosition();
+    // findZeroPosition();
 
     Serial.println("Done");
 };
@@ -162,7 +163,7 @@ float Puller::getMostRecentPosition() {
 }
 
 float Puller::getPIDOutput(float error) {
-    float kp = 2.0; // Pc ~140?
+    float kp = 10.0; // Pc ~140?
     float kd = 0.0;
     float ki = 0.0;
 

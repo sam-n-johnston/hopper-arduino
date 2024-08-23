@@ -35,7 +35,8 @@ public:
         uint8_t OCM,
         uint8_t DIAG,
         uint8_t EN,
-        bool direction);
+        bool direction,
+        int zeroPosition);
 
     float getCurrentPosition();
     void setMotorTorque(float speed);
