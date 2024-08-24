@@ -89,8 +89,7 @@ void IMU::getSensorData()
             sensorValue.un.gameRotationVector.real,
             sensorValue.un.gameRotationVector.i,
             sensorValue.un.gameRotationVector.j,
-            sensorValue.un.gameRotationVector.k,
-            true);
+            sensorValue.un.gameRotationVector.k);
         break;
     // case SH2_GYROSCOPE_CALIBRATED:
     //     lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
@@ -100,28 +99,78 @@ void IMU::getSensorData()
     }
 }
 
-Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees)
+Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk)
 {
-    float sqr = sq(qr);
-    float sqi = sq(qi);
-    float sqj = sq(qj);
-    float sqk = sq(qk);
+    // Serial.print("Got it - qr: ");
+    // Serial.print(qr);
+    // Serial.print(",\tqi: ");
+    // Serial.print(qi);
+    // Serial.print(",\tqj: ");
+    // Serial.print(qj);
+    // Serial.print(",\tqk: ");
+    // Serial.print(qk);
+    // Serial.println();
 
     Vector tempVector;
 
-    tempVector.z = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
-    tempVector.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
-    tempVector.x = atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (qr * qi + qj * qk);
+    double cosr_cosp = 1 - 2 * (qi * qi + qj * qj);
+    tempVector.x = std::atan2(sinr_cosp, cosr_cosp);
 
-    if (degrees)
-    {
-        tempVector.x *= RAD_TO_DEG;
-        tempVector.y *= RAD_TO_DEG;
-        tempVector.z *= RAD_TO_DEG;
-    }
+    // pitch (y-axis rotation)
+    double sinp = std::sqrt(1 + 2 * (qr * qj - qi * qk));
+    double cosp = std::sqrt(1 - 2 * (qr * qj - qi * qk));
+    tempVector.y = 2 * std::atan2(sinp, cosp) - M_PI / 2;
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (qr * qk + qi * qj);
+    double cosy_cosp = 1 - 2 * (qj * qj + qk * qk);
+    tempVector.z = std::atan2(siny_cosp, cosy_cosp);
+
+    tempVector.x *= RAD_TO_DEG;
+    tempVector.y *= RAD_TO_DEG;
+    tempVector.z *= RAD_TO_DEG;
+
+    // Calibrate with offset
+    tempVector.x += 1.0;
+    tempVector.y -= 4.4;
+
+    // Calibrate with factor
+    // tempVector.x = tempVector.x > 0.0 ? tempVector.x * 0.974026 : tempVector.x * 1.023891;
+    // tempVector.y = tempVector.y > 0.0 ? tempVector.y * 1.045296 : tempVector.y * 0.952381;
+
+    Serial.print("Rotation - X: ");
+    Serial.print(tempVector.x);
+    Serial.print(",\tY: ");
+    Serial.print(tempVector.y);
+    Serial.println();
 
     return tempVector;
 }
+
+// Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees)
+// {
+//     float sqr = sq(qr);
+//     float sqi = sq(qi);
+//     float sqj = sq(qj);
+//     float sqk = sq(qk);
+
+//     Vector tempVector;
+
+//     tempVector.z = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));
+//     tempVector.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));
+//     tempVector.x = atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));
+
+//     if (degrees)
+//     {
+//         tempVector.x *= RAD_TO_DEG;
+//         tempVector.y *= RAD_TO_DEG;
+//         tempVector.z *= RAD_TO_DEG;
+//     }
+
+//     return tempVector;
+// }
 
 Vector IMU::getLinearAcceleration()
 {
