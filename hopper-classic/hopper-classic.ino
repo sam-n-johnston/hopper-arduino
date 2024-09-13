@@ -57,8 +57,6 @@ void setup1()
 
     customImu.begin();
     robot.begin();
-    // puller.begin();
-    // puller.torqueOff();
     Serial.println("Starting Core1 5");
     setupDone = true;
 }
@@ -82,24 +80,24 @@ void loop1()
     {
         bodyOrientation = customImu.getOrientation();
 
-        // robot.updateStateIfChanged();
-        // if (robot.getCurrentState() == STANCE_GOING_DOWN ||
-        //     robot.getCurrentState() == STANCE_GOING_UP)
-        // {
+        robot.updateStateIfChanged();
+        if (robot.getCurrentState() == STANCE_GOING_DOWN ||
+            robot.getCurrentState() == STANCE_GOING_UP)
+        {
             robot.sendCommandsToDuringStance(
                 bodyOrientation.x,
                 bodyOrientation.y);
-        // }
-        // else
-        // {
-        //     robot.sendCommandsToMotorsDuringFlight(
-        //         0.0,
-        //         0.0,
-        //         bodyOrientation.x,
-        //         bodyOrientation.y,
-        //         0.0,
-        //         0.0);
-        // }
+        }
+        else
+        {
+            robot.sendCommandsToMotorsDuringFlight(
+                0.0,
+                0.0,
+                bodyOrientation.x,
+                bodyOrientation.y,
+                0.0,
+                0.0);
+        }
 
         if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y))
         {

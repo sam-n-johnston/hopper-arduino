@@ -55,19 +55,19 @@ int Robot::getCurrentState() { return this->currentState; }
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY)
 {
-    // switch (this->currentState)
-    // {
-    // case STANCE_GOING_DOWN:
+    switch (this->currentState)
+    {
+    case STANCE_GOING_DOWN:
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
-    // case STANCE_GOING_UP:
-    //     // this->leg->pushDown();
-    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-    //     break;
+        break;
+    case STANCE_GOING_UP:
+        this->leg->pushDown();
+        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+        break;
 
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(
