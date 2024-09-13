@@ -116,7 +116,7 @@ void Leg::torqueOff() {
 }
 
 void Leg::torqueOn() {
-    // this->puller->torqueOn();
+    this->puller->torqueOn();
     dxl.torqueOn(servoXId);
     dxl.torqueOn(servoYId);
 }
