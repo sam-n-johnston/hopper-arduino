@@ -1,15 +1,42 @@
 #include "leg.h"
 
-Leg::Leg(Puller *puller, Servo *servoX, Servo *servoY) {
+Leg::Leg(Puller *puller, int servoXId, int servoYId) {
     this->puller = puller;
-    this->servoX = servoX;
-    this->servoY = servoY;
+    this->servoXId = servoXId;
+    this->servoYId = servoYId;
 }
 
 void Leg::begin() {
     this->puller->begin();
-    this->servoX->attach(18, 400, 2600);
-    this->servoY->attach(19, 400, 2600);
+
+    const int DXL_DIR_PIN = 28; // DYNAMIXEL Shield DIR PIN - Dummy pin here
+    const float DXL_PROTOCOL_VERSION = 2.0;
+
+    this->dxl = Dynamixel2Arduino(Serial2, DXL_DIR_PIN);
+    dxl.begin(57600);
+    delay(50);
+    dxl.setPortProtocolVersion(DXL_PROTOCOL_VERSION);
+    bool pingResX = dxl.ping(servoXId);
+    bool pingResY = dxl.ping(servoYId);
+    Serial.print("Ping Servo X: ");
+    Serial.print(pingResX);
+    Serial.print(" - Y: ");
+    Serial.println(pingResY);
+
+    dxl.torqueOff(servoXId);
+    delay(50);
+    dxl.setOperatingMode(servoXId, OP_POSITION);
+    delay(50);
+    dxl.torqueOn(servoXId);
+
+    delay(50);
+    dxl.torqueOff(servoYId);
+    delay(50);
+    dxl.setOperatingMode(servoYId, OP_POSITION);
+    delay(50);
+    dxl.torqueOn(servoYId);
+
+    Serial.println("Leg Setup complete");
 }
 
 /**
@@ -18,7 +45,8 @@ void Leg::begin() {
  * @return float: returns the angle of the leg in relation to the body
  */
 float Leg::getAlphaXInDeg() {
-    return servoXDesiredPositionDeg;
+    int present_position = dxl.getPresentPosition(servoXId);
+    return present_position;
 }
 
 /**
@@ -27,13 +55,14 @@ float Leg::getAlphaXInDeg() {
  * @return float: returns the angle of the leg in relation to the body
  */
 float Leg::getAlphaYInDeg() {
-    return servoYDesiredPositionDeg;
+    int present_position = dxl.getPresentPosition(servoYId);
+    return present_position;
 }
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
-    float limit = 30.0;
-    float xOffset = 1.5;
-    float yOffset = -2.0;
+    float limit = 35.0;
+    float xOffset = 0.0;
+    float yOffset = 0.0;
     float desiredDegX = degX + xOffset;
     float desiredDegY = degY + yOffset;
 
@@ -46,16 +75,18 @@ void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
     if (desiredDegY < -limit)
         desiredDegY = -limit;
 
-    float limitedPositionY = 90.0 + desiredDegY;
+    float limitedPositionX = 180.0 + desiredDegX;
+    float limitedPositionY = 180.0 - desiredDegY;
 
-    servoXDesiredPositionDeg = desiredDegX;
-    servoYDesiredPositionDeg = desiredDegY;
+    int finalRawGoalPositionX = limitedPositionX / 360.0 * 4096;
+    int finalRawGoalPositionY = limitedPositionY / 360.0 * 4096;
 
-    // Serial.print("Y: ");
-    // Serial.println(desiredDegY);
+    // Serial.print("finalRawGoalPositionY: ");
+    // Serial.println(finalRawGoalPositionY);
 
-    this->servoX->write(90.0 - desiredDegX);
-    this->servoY->write(90.0 + desiredDegY);
+    dxl.setGoalPosition(servoXId, finalRawGoalPositionX);
+    delay(5);
+    dxl.setGoalPosition(servoYId, finalRawGoalPositionY);
 }
 
 void Leg::pushDown() {
@@ -80,12 +111,12 @@ bool Leg::isFootTouchingGround() {
 
 void Leg::torqueOff() {
     this->puller->torqueOff();
-    this->servoX->detach();
-    this->servoY->detach();
+    dxl.torqueOff(servoXId);
+    dxl.torqueOff(servoYId);
 }
 
 void Leg::torqueOn() {
-    this->puller->torqueOn();
-    this->servoX->attach(18, 400, 2600);
-    this->servoY->attach(19, 400, 2600);
+    // this->puller->torqueOn();
+    dxl.torqueOn(servoXId);
+    dxl.torqueOn(servoYId);
 }

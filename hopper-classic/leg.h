@@ -5,20 +5,22 @@
 #include "puller.h"
 #include "vector.h"
 #include <SPI.h>
+#include <Dynamixel2Arduino.h>
 
 const float degToRad = 0.0174533;
 
 class Leg {
 private:
     Puller *puller;
-    Servo *servoX;
-    Servo *servoY;
+    int servoXId;
+    int servoYId;
+    Dynamixel2Arduino dxl;
     int footSensorPin = 27;
     float servoXDesiredPositionDeg = 0.0;
     float servoYDesiredPositionDeg = 0.0;
 
 public:
-    Leg(Puller *puller,  Servo *servoX, Servo *servoY);
+    Leg(Puller *puller,  int servoXId, int servoYId);
 
     void begin();
     float getAlphaXInDeg();
