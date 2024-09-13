@@ -76,16 +76,10 @@ void loop1()
         loops1 = 0;
     }
 
-    // puller.getCurrentPosition();
-
     customImu.getSensorData();
 
-    puller.setPositionInDeg(-30.0);
-    // puller.torqueOff();
-    // puller.goToDesiredPosition();
-
-    // if (!robotFell)
-    // {
+    if (!robotFell)
+    {
     //     bool isFootTouchingGround = leg.isFootTouchingGround();
         bodyOrientation = customImu.getOrientation();
 
@@ -108,14 +102,14 @@ void loop1()
             //     0.0);
     //     }
 
-    //     if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y))
-    //     {
-    //         Serial.println("Robot fell!");
-    //         robot.stop();
-    //         robotFell = true;
-    //         Serial.println("Stopping motors because robot fell");
-    //     }
-    // }
+        if (robot.hasFallen(bodyOrientation.x, bodyOrientation.y))
+        {
+            Serial.println("Robot fell!");
+            robot.stop();
+            robotFell = true;
+            Serial.println("Stopping motors because robot fell");
+        }
+    }
 }
 
 void setup()
