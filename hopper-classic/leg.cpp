@@ -17,12 +17,14 @@ void Leg::begin() {
     delay(50);
     dxl.setPortProtocolVersion(DXL_PROTOCOL_VERSION);
     bool pingResX = dxl.ping(servoXId);
+    delay(50);
     bool pingResY = dxl.ping(servoYId);
     Serial.print("Ping Servo X: ");
     Serial.print(pingResX);
     Serial.print(" - Y: ");
     Serial.println(pingResY);
 
+    delay(50);
     dxl.torqueOff(servoXId);
     delay(50);
     dxl.setOperatingMode(servoXId, OP_POSITION);
@@ -45,8 +47,11 @@ void Leg::begin() {
  * @return float: returns the angle of the leg in relation to the body
  */
 float Leg::getAlphaXInDeg() {
-    int present_position = dxl.getPresentPosition(servoXId);
-    return present_position;
+    return servoXDesiredPositionDeg;
+    // delay(25);
+    // int present_position = dxl.getPresentPosition(servoXId);
+    // delay(25);
+    // return present_position / 4096.0 * 360.0 - 180.0;
 }
 
 /**
@@ -55,8 +60,11 @@ float Leg::getAlphaXInDeg() {
  * @return float: returns the angle of the leg in relation to the body
  */
 float Leg::getAlphaYInDeg() {
-    int present_position = dxl.getPresentPosition(servoYId);
-    return present_position;
+    return servoYDesiredPositionDeg;
+    // delay(25);
+    // int present_position = dxl.getPresentPosition(servoYId);
+    // delay(25);
+    // return present_position / 4096.0 * 360.0 - 180.0;
 }
 
 void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
@@ -80,6 +88,9 @@ void Leg::setDesiredAlphaXYInDeg(float degX, float degY) {
 
     int finalRawGoalPositionX = limitedPositionX / 360.0 * 4096;
     int finalRawGoalPositionY = limitedPositionY / 360.0 * 4096;
+
+    servoXDesiredPositionDeg = desiredDegX;
+    servoYDesiredPositionDeg = desiredDegY;
 
     // Serial.print("finalRawGoalPositionY: ");
     // Serial.println(finalRawGoalPositionY);
@@ -111,12 +122,16 @@ bool Leg::isFootTouchingGround() {
 
 void Leg::torqueOff() {
     this->puller->torqueOff();
+    delay(5);
     dxl.torqueOff(servoXId);
+    delay(5);
     dxl.torqueOff(servoYId);
 }
 
 void Leg::torqueOn() {
     this->puller->torqueOn();
+    delay(5);
     dxl.torqueOn(servoXId);
+    delay(5);
     dxl.torqueOn(servoYId);
 }

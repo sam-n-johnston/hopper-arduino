@@ -55,19 +55,19 @@ int Robot::getCurrentState() { return this->currentState; }
 void Robot::sendCommandsToDuringStance(
     float bodyOrientationX, float bodyOrientationY)
 {
-    switch (this->currentState)
-    {
-    case STANCE_GOING_DOWN:
+    // switch (this->currentState)
+    // {
+    // case STANCE_GOING_DOWN:
         this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-        break;
-    case STANCE_GOING_UP:
-        this->leg->pushDown();
-        this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
-        break;
+    //     break;
+    // case STANCE_GOING_UP:
+    //     // this->leg->pushDown();
+    //     this->moveLegToKeepRobotUpright(bodyOrientationX, bodyOrientationY);
+    //     break;
 
-    default:
-        break;
-    }
+    // default:
+    //     break;
+    // }
 }
 
 void Robot::sendCommandsToMotorsDuringFlight(
@@ -78,38 +78,30 @@ void Robot::sendCommandsToMotorsDuringFlight(
     float bodyOrientationXDot,
     float bodyOrientationYDot)
 {
-    this->moveLegForDesiredHorizontalSpeed(
-        xd,
-        yd,
-        bodyOrientationX,
-        bodyOrientationY,
-        bodyOrientationXDot,
-        bodyOrientationYDot);
-    // switch (this->currentState)
-    // {
-    // case FLIGHT_GOING_UP:
-    //     this->leg->stopPushingDown();
-    //     this->moveLegForDesiredHorizontalSpeed(
-    //         xd,
-    //         yd,
-    //         bodyOrientationX,
-    //         bodyOrientationY,
-    //         bodyOrientationXDot,
-    //         bodyOrientationYDot);
-    //     break;
-    // case FLIGHT_GOING_DOWN:
-    //     this->moveLegForDesiredHorizontalSpeed(
-    //         xd,
-    //         yd,
-    //         bodyOrientationX,
-    //         bodyOrientationY,
-    //         bodyOrientationXDot,
-    //         bodyOrientationYDot);
-    //     break;
-
-    // default:
-    //     break;
-    // }
+    switch (this->currentState)
+    {
+    case FLIGHT_GOING_UP:
+        this->leg->stopPushingDown();
+        this->moveLegForDesiredHorizontalSpeed(
+            xd,
+            yd,
+            bodyOrientationX,
+            bodyOrientationY,
+            bodyOrientationXDot,
+            bodyOrientationYDot);
+        break;
+    case FLIGHT_GOING_DOWN:
+        this->moveLegForDesiredHorizontalSpeed(
+            xd,
+            yd,
+            bodyOrientationX,
+            bodyOrientationY,
+            bodyOrientationXDot,
+            bodyOrientationYDot);
+        break;
+    default:
+        break;
+    }
 }
 
 /**
@@ -124,7 +116,7 @@ void Robot::moveLegToKeepRobotUpright(float bodyOrientationX, float bodyOrientat
     float alphaY = this->leg->getAlphaYInDeg();
 
     // Create PD control
-    float kp = 0.01;
+    float kp = 0.1;
 
     /**
      * We want both thetas to be 0 degrees,
