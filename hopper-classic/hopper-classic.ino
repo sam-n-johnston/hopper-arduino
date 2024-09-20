@@ -5,7 +5,7 @@
 #include "robot.h"
 
 const int PULLER_PWM1 = 12, PULLER_PWM2 = 11, PULLER_OCM = 26, PULLER_DIAG = 13,
-          PULLER_EN = 10, PULLER_ZERO_POSITION = 2135;
+          PULLER_EN = 10, PULLER_ZERO_POSITION = 2622;
 
 IMU customImu = IMU();
 
@@ -29,12 +29,23 @@ Vector linearAcceleration;
 Vector linearVelocity;
 Vector angularVelocity;
 
+void blink(int numberOfBlinks) {
+    for (int i = 0; i < numberOfBlinks; i++) {
+        digitalWrite(LED_BUILTIN, 1);
+        delay(250);
+        digitalWrite(LED_BUILTIN, 0);
+        delay(250);
+    }
+}
+
 void setup1()
 {
     delay(5000);
+    pinMode(LED_BUILTIN, OUTPUT);
     Serial.begin(115200);
-    while (!Serial)
-        delay(10); // will pause Zero, Leonardo, etc until serial console opens
+    blink(2);
+    // while (!Serial)
+    //     delay(10); // will pause Zero, Leonardo, etc until serial console opens
     Serial.println("Starting Core1");
 
     // For the AS5600
@@ -53,6 +64,9 @@ void setup1()
         Serial.print(test3);
         Serial.print(test4);
         Serial.println();
+        blink(2);
+        delay(1000);
+        blink(2);
     }
 
     customImu.begin();
@@ -134,5 +148,5 @@ void loop()
         loops = 0;
     }
 
-    puller.goToDesiredPosition();
+    // puller.goToDesiredPosition();
 }

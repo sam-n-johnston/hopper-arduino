@@ -1,5 +1,14 @@
 #include "imu.h"
 
+void blinkIMU(int numberOfBlinks) {
+    for (int i = 0; i < numberOfBlinks; i++) {
+        digitalWrite(LED_BUILTIN, 1);
+        delay(250);
+        digitalWrite(LED_BUILTIN, 0);
+        delay(250);
+    }
+}
+
 IMU::IMU() {}
 
 void IMU::begin()
@@ -8,10 +17,12 @@ void IMU::begin()
     bool test3 = Wire.setSDA(16);
     bool test4 = Wire.setSCL(17);
     Wire.begin();
+    delay(50);
     while (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire))
     {
         Serial.println("Failed to find BNO08x chip");
-        delay(100);
+        blinkIMU(3);
+        delay(1000);
     }
 
     setReports();
@@ -97,7 +108,7 @@ Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk)
     tempVector.z *= RAD_TO_DEG;
 
     // Calibrate with offset
-    tempVector.x += 0.6;
+    tempVector.x -= 0.0;
     tempVector.y -= 3.5;
 
     // Calibrate with factor
@@ -146,8 +157,8 @@ Vector IMU::getOrientation()
     // Serial.print(lastOrientation.x);
     // Serial.print(", y: ");
     // Serial.print(lastOrientation.y);
-    // Serial.print(", z: ");
-    // Serial.print(lastOrientation.z);
+    // // Serial.print(", z: ");
+    // // Serial.print(lastOrientation.z);
     // Serial.println();
 
     return lastOrientation;
