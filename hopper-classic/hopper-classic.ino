@@ -148,5 +148,5 @@ void loop()
         loops = 0;
     }
 
-    // puller.goToDesiredPosition();
+    puller.goToDesiredPosition();
 }
