@@ -109,7 +109,7 @@ Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk)
 
     // Calibrate with offset
     tempVector.x -= 0.0;
-    tempVector.y -= 3.5;
+    tempVector.y -= 1.5;
 
     // Calibrate with factor
     // tempVector.x = tempVector.x > 0.0 ? tempVector.x * 0.974026 : tempVector.x * 1.023891;
