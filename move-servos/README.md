@@ -1,3 +1,9 @@
+## Objective
+
+The objective is to move a XL-430 Robotis servo to make sure it's working as expected, or to move it in preparation before screwing it in
+
+## Guide
+
 To get this working:
 
 1. Install the `Arduino Mbed OS RP2040 Boards` in the board manager
