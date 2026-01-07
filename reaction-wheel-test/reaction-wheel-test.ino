@@ -17,11 +17,78 @@ void blink(int numberOfBlinks) {
     }
 }
 
+
+const int REACTION_MOTOR_Y_PWM1 = 0, REACTION_MOTOR_Y_PWM2 = 2, REACTION_MOTOR_Y_DIAG = 4,
+          REACTION_MOTOR_Y_EN = 6;
+// const int REACTION_MOTOR_Y_OCM = 27;
+const int REACTION_MOTOR_X_PWM1 = 1, REACTION_MOTOR_X_PWM2 = 3, REACTION_MOTOR_X_DIAG = 5,
+          REACTION_MOTOR_X_EN = 7;
+
+// torque between 0 and 255
+void setMotorTorqueX(int torque, bool direction) {
+    digitalWrite(REACTION_MOTOR_X_EN, HIGH);
+    if (direction) {
+        digitalWrite(REACTION_MOTOR_X_PWM1, 0);
+        analogWrite(REACTION_MOTOR_X_PWM2, torque);
+    } else {
+        analogWrite(REACTION_MOTOR_X_PWM1, torque);
+        digitalWrite(REACTION_MOTOR_X_PWM2, 0);
+    }
+}
+
+
+void setMotorTorqueY(int torque, bool direction) {
+    digitalWrite(REACTION_MOTOR_Y_EN, HIGH);
+    if (direction) {
+        digitalWrite(REACTION_MOTOR_Y_PWM1, 0);
+        analogWrite(REACTION_MOTOR_Y_PWM2, torque);
+    } else {
+        analogWrite(REACTION_MOTOR_Y_PWM1, torque);
+        digitalWrite(REACTION_MOTOR_Y_PWM2, 0);
+    }
+}
+
+void setupMotors()
+{
+    delay(5000);
+    Serial.begin(115200);
+    Serial.write("DONE world\n");
+
+    // SETUP Motor Y
+    // Disable Motor
+    pinMode(REACTION_MOTOR_X_EN, OUTPUT);
+    digitalWrite(REACTION_MOTOR_X_EN, LOW);
+
+    pinMode(REACTION_MOTOR_X_PWM1, OUTPUT);
+    pinMode(REACTION_MOTOR_X_PWM2, OUTPUT);
+    // pinMode(REACTION_MOTOR_X_OCM, INPUT);
+    // pinMode(REACTION_MOTOR_X_DIAG, INPUT);
+    digitalWrite(REACTION_MOTOR_X_PWM1, LOW);
+    digitalWrite(REACTION_MOTOR_X_PWM2, LOW);
+
+    // SETUP Motor Y
+
+    pinMode(REACTION_MOTOR_Y_EN, OUTPUT);
+    digitalWrite(REACTION_MOTOR_Y_EN, LOW);
+
+    pinMode(REACTION_MOTOR_Y_PWM1, OUTPUT);
+    pinMode(REACTION_MOTOR_Y_PWM2, OUTPUT);
+    // pinMode(REACTION_MOTOR_Y_OCM, INPUT);
+    // pinMode(REACTION_MOTOR_Y_DIAG, INPUT);
+    digitalWrite(REACTION_MOTOR_Y_PWM1, LOW);
+    digitalWrite(REACTION_MOTOR_Y_PWM2, LOW);
+
+    Serial.println("Setup complete\n");
+}
+
+
 void setup()
 {
     delay(5000);
     Serial.begin(115200);
-    Serial.write("DONE world");
+    Serial.write("Starting...");
+
+    setupMotors();
 
     dlx = Dynamixel2Arduino(Serial2, DXL_DIR_PIN);
     dlx.begin(57600);
@@ -61,6 +128,9 @@ void setup()
 
 void loop()
 {
+    setMotorTorqueX(50, true);
+    setMotorTorqueY(50, true);
+
     int present_position_x = dlx.getPresentPosition(X_SERVO_ID);
     delay(50);
     int present_position_y = dlx.getPresentPosition(Y_SERVO_ID);
