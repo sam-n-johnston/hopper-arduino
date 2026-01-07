@@ -1,10 +1,14 @@
 #include <Dynamixel2Arduino.h>
+#include "imu.h"
 
 UART Serial2(8, 9, 0, 0);
 const int DXL_DIR_PIN = 28; // DYNAMIXEL Shield DIR PIN - Dummy pin here
 const float DXL_PROTOCOL_VERSION = 2.0;
 const int X_SERVO_ID = 1;
 const int Y_SERVO_ID = 2;
+
+IMU customImu = IMU();
+Vector bodyOrientation;
 
 Dynamixel2Arduino dlx;
 
@@ -88,6 +92,7 @@ void setup()
     Serial.write("Starting...");
 
     setupMotors();
+    customImu.begin();
 
     dlx = Dynamixel2Arduino(Serial2, DXL_DIR_PIN);
     dlx.begin(57600);
@@ -127,6 +132,14 @@ void setup()
 
 void loop()
 {
+    customImu.getSensorData();
+    bodyOrientation = customImu.getOrientation();
+
+    Serial.print("Body Orientation - X: ");
+    Serial.print(bodyOrientation.x);
+    Serial.print(", Y: ");
+    Serial.println(bodyOrientation.y);
+
     setMotorTorqueX(50, true);
     setMotorTorqueY(50, true);
 
