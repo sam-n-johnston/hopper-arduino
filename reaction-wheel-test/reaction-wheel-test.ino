@@ -20,7 +20,6 @@ void blink(int numberOfBlinks) {
 
 const int REACTION_MOTOR_Y_PWM1 = 0, REACTION_MOTOR_Y_PWM2 = 2, REACTION_MOTOR_Y_DIAG = 4,
           REACTION_MOTOR_Y_EN = 6;
-// const int REACTION_MOTOR_Y_OCM = 27;
 const int REACTION_MOTOR_X_PWM1 = 1, REACTION_MOTOR_X_PWM2 = 3, REACTION_MOTOR_X_DIAG = 5,
           REACTION_MOTOR_X_EN = 7;
 
