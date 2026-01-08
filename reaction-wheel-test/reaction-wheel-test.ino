@@ -12,6 +12,77 @@ Vector bodyOrientation;
 
 Dynamixel2Arduino dlx;
 
+// --- Reaction wheel control state ---
+const unsigned long CONTROL_INTERVAL_US = 20000; // 50 Hz control loop
+unsigned long lastControlMicros = 0;
+const unsigned long SERVO_UPDATE_INTERVAL_US = 200000; // 5 Hz servo update
+unsigned long lastServoMicros = 0;
+
+// PID gains (initial values, tune on hardware)
+float pidX_kp = 3.0f, pidX_ki = 0.0f, pidX_kd = 0.02f;
+float pidY_kp = 3.0f, pidY_ki = 0.0f, pidY_kd = 0.02f;
+
+float pidX_integral = 0.0f, pidX_prevError = 0.0f;
+float pidY_integral = 0.0f, pidY_prevError = 0.0f;
+
+// Simple low-pass for gyro rates
+float filteredRateX = 0.0f, filteredRateY = 0.0f;
+const float rateFilterAlpha = 0.6f; // 0..1, higher = smoother
+
+int maxTorquePWM = 220; // cap torque PWM
+
+bool reactionControlEnabled = true;
+
+// Read IMU and update filtered angular rates (deg/s)
+void readIMUrates()
+{
+    customImu.getSensorData();
+    Vector ang = customImu.getAngularVelocity();
+    // ang.x and ang.y are expected in degrees/sec from IMU implementation
+    filteredRateX = rateFilterAlpha * filteredRateX + (1.0f - rateFilterAlpha) * ang.x;
+    filteredRateY = rateFilterAlpha * filteredRateY + (1.0f - rateFilterAlpha) * ang.y;
+    // keep orientation for safety/debug
+    bodyOrientation = customImu.getOrientation();
+}
+
+// Simple PID that returns a signed control value (mapped to PWM units)
+float pidUpdate(float setpoint, float measurement, float &integral, float &prevError,
+                float kp, float ki, float kd, float dt)
+{
+    float error = setpoint - measurement;
+    integral += error * dt;
+    // anti-windup: clamp integral
+    const float maxIntegral = 1000.0f;
+    if (integral > maxIntegral) integral = maxIntegral;
+    if (integral < -maxIntegral) integral = -maxIntegral;
+    float derivative = 0.0f;
+    if (dt > 0.0f) derivative = (error - prevError) / dt;
+    prevError = error;
+    float out = kp * error + ki * integral + kd * derivative;
+    return out;
+}
+
+// Apply signed control value to motors (convert to PWM + direction)
+void applyReactionControl(float controlX, float controlY)
+{
+    if (!reactionControlEnabled)
+    {
+        setMotorTorqueX(0, false);
+        setMotorTorqueY(0, false);
+        return;
+    }
+
+    int pwmX = (int)fabs(controlX);
+    if (pwmX > maxTorquePWM) pwmX = maxTorquePWM;
+    bool dirX = controlX > 0.0f; // positive control -> spin in "true" direction
+    setMotorTorqueX(pwmX, dirX);
+
+    int pwmY = (int)fabs(controlY);
+    if (pwmY > maxTorquePWM) pwmY = maxTorquePWM;
+    bool dirY = controlY > 0.0f;
+    setMotorTorqueY(pwmY, dirY);
+}
+
 void blink(int numberOfBlinks) {
     for (int i = 0; i < numberOfBlinks; i++) {
         digitalWrite(LED_BUILTIN, 1);
@@ -94,6 +165,12 @@ void setup()
     setupMotors();
     customImu.begin();
 
+    // initialize control timing
+    lastControlMicros = micros();
+    lastServoMicros = micros();
+    filteredRateX = 0.0f;
+    filteredRateY = 0.0f;
+
     dlx = Dynamixel2Arduino(Serial2, DXL_DIR_PIN);
     dlx.begin(57600);
     delay(50);
@@ -132,27 +209,68 @@ void setup()
 
 void loop()
 {
-    customImu.getSensorData();
-    bodyOrientation = customImu.getOrientation();
+    unsigned long now = micros();
 
-    Serial.print("Body Orientation - X: ");
-    Serial.print(bodyOrientation.x);
-    Serial.print(", Y: ");
-    Serial.println(bodyOrientation.y);
+    // Control loop (run at CONTROL_INTERVAL_US)
+    if ((now - lastControlMicros) >= CONTROL_INTERVAL_US)
+    {
+        float dt = (now - lastControlMicros) / 1000000.0f; // seconds
+        lastControlMicros = now;
 
-    setMotorTorqueX(50, true);
-    setMotorTorqueY(50, true);
+        // Read IMU and update filtered rates
+        readIMUrates();
 
-    int present_position_x = dlx.getPresentPosition(X_SERVO_ID);
-    delay(50);
-    int present_position_y = dlx.getPresentPosition(Y_SERVO_ID);
-    delay(50);
+        // Safety: if orientation is extreme, disable control
+        if (fabs(bodyOrientation.x) > 60.0f || fabs(bodyOrientation.y) > 60.0f)
+        {
+            reactionControlEnabled = false;
+            Serial.println("Safety: orientation exceeded limit, disabling reaction control");
+            setMotorTorqueX(0, false);
+            setMotorTorqueY(0, false);
+        }
 
-    float desiredDegreeAngle = 180.0;
-    float desiredRawAngle = desiredDegreeAngle / 360.0 * 4096.0;
+        // Compute PID outputs (setpoint = 0 deg/s)
+        float controlX = pidUpdate(0.0f, filteredRateX, pidX_integral, pidX_prevError,
+                                   pidX_kp, pidX_ki, pidX_kd, dt);
+        float controlY = pidUpdate(0.0f, filteredRateY, pidY_integral, pidY_prevError,
+                                   pidY_kp, pidY_ki, pidY_kd, dt);
 
-    dlx.setGoalPosition(X_SERVO_ID, desiredRawAngle);
-    delay(50);
-    dlx.setGoalPosition(Y_SERVO_ID, desiredRawAngle);
-    delay(50);
+        // Map PID output to PWM range and apply
+        // The PID output is interpreted as PWM magnitude; tune kp/ki/kd accordingly.
+        applyReactionControl(controlX, controlY);
+
+        // debug print occasionally
+        static unsigned long lastDebugMillis = 0;
+        if (millis() - lastDebugMillis > 1000)
+        {
+            lastDebugMillis = millis();
+            Serial.print("Rates (deg/s) X:");
+            Serial.print(filteredRateX);
+            Serial.print(" Y:");
+            Serial.print(filteredRateY);
+            Serial.print(" -> PWM X:");
+            Serial.print((int)fabs(controlX));
+            Serial.print(" Y:");
+            Serial.println((int)fabs(controlY));
+        }
+    }
+
+    // Servo updates at lower frequency to avoid blocking the control loop
+    if ((now - lastServoMicros) >= SERVO_UPDATE_INTERVAL_US)
+    {
+        lastServoMicros = now;
+
+        int present_position_x = dlx.getPresentPosition(X_SERVO_ID);
+        delay(10);
+        int present_position_y = dlx.getPresentPosition(Y_SERVO_ID);
+        delay(10);
+
+        float desiredDegreeAngle = 180.0;
+        float desiredRawAngle = desiredDegreeAngle / 360.0 * 4096.0;
+
+        dlx.setGoalPosition(X_SERVO_ID, desiredRawAngle);
+        delay(10);
+        dlx.setGoalPosition(Y_SERVO_ID, desiredRawAngle);
+        delay(10);
+    }
 }

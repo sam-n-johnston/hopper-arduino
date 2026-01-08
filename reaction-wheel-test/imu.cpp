@@ -37,6 +37,10 @@ void IMU::setReports()
     {
         Serial.println("Could not enable rotation vector");
     }
+    if (!bno08x.enableReport(SH2_GYROSCOPE_CALIBRATED))
+    {
+        Serial.println("Could not enable gyroscope");
+    }
 }
 
 void IMU::getSensorData()
@@ -71,6 +75,12 @@ void IMU::getSensorData()
             sensorValue.un.gameRotationVector.i,
             sensorValue.un.gameRotationVector.j,
             sensorValue.un.gameRotationVector.k);
+        break;
+    case SH2_GYROSCOPE_CALIBRATED:
+        // Populate angular velocity (degrees/sec)
+        lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
+        lastAngularVelocity.y = sensorValue.un.gyroscope.y;
+        lastAngularVelocity.z = sensorValue.un.gyroscope.z;
         break;
     }
 }
