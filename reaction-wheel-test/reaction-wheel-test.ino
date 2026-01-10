@@ -13,8 +13,9 @@ Vector bodyOrientation;
 Dynamixel2Arduino dlx;
 
 // --- Reaction wheel control state ---
-const unsigned long CONTROL_INTERVAL_US = 20000; // 50 Hz control loop
+const unsigned long CONTROL_INTERVAL_US = 1000; // 50 Hz control loop
 unsigned long lastControlMicros = 0;
+float timeDelta = 0;
 const unsigned long SERVO_UPDATE_INTERVAL_US = 200000; // 5 Hz servo update
 unsigned long lastServoMicros = 0;
 
@@ -26,23 +27,53 @@ float pidX_integral = 0.0f, pidX_prevError = 0.0f;
 float pidY_integral = 0.0f, pidY_prevError = 0.0f;
 
 // Simple low-pass for gyro rates
-float filteredRateX = 0.0f, filteredRateY = 0.0f;
-const float rateFilterAlpha = 0.6f; // 0..1, higher = smoother
+const float ANGLE_FILTER_G = 0.999f; // gyro portion of complementary filter [0...1]
+Vector gyroAngle;
+Vector filteredAngle;
 
 int maxTorquePWM = 220; // cap torque PWM
 
 bool reactionControlEnabled = true;
 
-// Read IMU and update filtered angular rates (deg/s)
+void logVector(Vector vec)
+{
+    Serial.print(vec.x);
+    Serial.print(",");
+    // Serial.print(vec.y);
+    // Serial.print(",");
+    // Serial.print(vec.z);
+    // Serial.print(",");
+}
+
+// Read IMU and update filtered angular rates (rad/s)
+// TODO - Need to merge acceleration reading 
+// with gyro readings and test them with video
 void readIMUrates()
 {
     customImu.getSensorData();
-    Vector ang = customImu.getAngularVelocity();
-    // ang.x and ang.y are expected in degrees/sec from IMU implementation
-    filteredRateX = rateFilterAlpha * filteredRateX + (1.0f - rateFilterAlpha) * ang.x;
-    filteredRateY = rateFilterAlpha * filteredRateY + (1.0f - rateFilterAlpha) * ang.y;
-    // keep orientation for safety/debug
+    Vector angularVelocity = customImu.getAngularVelocity(); // deg/s
+    // logVector(angularVelocity);
+
+    Vector gyroAngleDelta;
+    gyroAngleDelta.x = angularVelocity.x * timeDelta; 
+    gyroAngleDelta.y = angularVelocity.y * timeDelta;
+    gyroAngleDelta.z = angularVelocity.z * timeDelta;
+    // logVector(gyroAngleDelta);
+
+    gyroAngle.x += gyroAngleDelta.x;
+    gyroAngle.y += gyroAngleDelta.y;
+    gyroAngle.z += gyroAngleDelta.z;
+    logVector(gyroAngle);
+
     bodyOrientation = customImu.getOrientation();
+    logVector(bodyOrientation);
+
+    filteredAngle.x = ANGLE_FILTER_G * (filteredAngle.x +  gyroAngleDelta.x) + (1.0f - ANGLE_FILTER_G) * bodyOrientation.x;
+    filteredAngle.y = ANGLE_FILTER_G * (filteredAngle.y +  gyroAngleDelta.y) + (1.0f - ANGLE_FILTER_G) * bodyOrientation.y;
+    filteredAngle.z = ANGLE_FILTER_G * (filteredAngle.z +  gyroAngleDelta.z) + (1.0f - ANGLE_FILTER_G) * bodyOrientation.z;
+
+    logVector(filteredAngle);
+    Serial.println();
 }
 
 // Simple PID that returns a signed control value (mapped to PWM units)
@@ -126,7 +157,7 @@ void setupMotors()
 {
     delay(5000);
     Serial.begin(115200);
-    Serial.write("DONE world\n");
+    // Serial.write("Starting...\n");
 
     // SETUP Motor Y
     // Disable Motor
@@ -152,7 +183,7 @@ void setupMotors()
     digitalWrite(REACTION_MOTOR_Y_PWM1, LOW);
     digitalWrite(REACTION_MOTOR_Y_PWM2, LOW);
 
-    Serial.println("Setup complete\n");
+    // Serial.println("Setup complete\n");
 }
 
 
@@ -160,7 +191,15 @@ void setup()
 {
     delay(5000);
     Serial.begin(115200);
-    Serial.write("Starting...");
+    // Serial.write("Starting...");
+
+    gyroAngle.x = 0 ;
+    gyroAngle.y = 0 ;
+    gyroAngle.z = 0 ;
+    filteredAngle.x = 0 ;
+    filteredAngle.y = 0 ;
+    filteredAngle.z = 0 ;
+    delay(50);
 
     setupMotors();
     customImu.begin();
@@ -168,8 +207,6 @@ void setup()
     // initialize control timing
     lastControlMicros = micros();
     lastServoMicros = micros();
-    filteredRateX = 0.0f;
-    filteredRateY = 0.0f;
 
     dlx = Dynamixel2Arduino(Serial2, DXL_DIR_PIN);
     dlx.begin(57600);
@@ -179,16 +216,16 @@ void setup()
     // Ping the X servo to check connection
     bool pingRes = dlx.ping(X_SERVO_ID);
     delay(50);
-    Serial.println();
-    Serial.print("Ping Servo X: ");
-    Serial.print(pingRes);
+    // Serial.println();
+    // Serial.print("Ping Servo X: ");
+    // Serial.print(pingRes);
 
     // Ping the Y servo to check connection
     pingRes = dlx.ping(Y_SERVO_ID);
     delay(50);
-    Serial.println();
-    Serial.print("Ping Servo Y: ");
-    Serial.print(pingRes);
+    // Serial.println();
+    // Serial.print("Ping Servo Y: ");
+    // Serial.print(pingRes);
 
     delay(50);
     dlx.torqueOff(X_SERVO_ID);
@@ -203,8 +240,10 @@ void setup()
     delay(50);
     dlx.torqueOn(Y_SERVO_ID);
 
+    // Serial.println();
+    // Serial.println("Setup complete");
+    Serial.print("gyro:,body:,filtered:");
     Serial.println();
-    Serial.println("Setup complete");
 }
 
 void loop()
@@ -214,7 +253,7 @@ void loop()
     // Control loop (run at CONTROL_INTERVAL_US)
     if ((now - lastControlMicros) >= CONTROL_INTERVAL_US)
     {
-        float dt = (now - lastControlMicros) / 1000000.0f; // seconds
+        timeDelta = (now - lastControlMicros) / 1000000.0f; // seconds
         lastControlMicros = now;
 
         // Read IMU and update filtered rates
@@ -230,28 +269,28 @@ void loop()
         }
 
         // Compute PID outputs (setpoint = 0 deg/s)
-        float controlX = pidUpdate(0.0f, filteredRateX, pidX_integral, pidX_prevError,
-                                   pidX_kp, pidX_ki, pidX_kd, dt);
-        float controlY = pidUpdate(0.0f, filteredRateY, pidY_integral, pidY_prevError,
-                                   pidY_kp, pidY_ki, pidY_kd, dt);
+        float controlX = pidUpdate(0.0f, filteredAngle.x, pidX_integral, pidX_prevError,
+                                   pidX_kp, pidX_ki, pidX_kd, timeDelta);
+        float controlY = pidUpdate(0.0f, filteredAngle.y, pidY_integral, pidY_prevError,
+                                   pidY_kp, pidY_ki, pidY_kd, timeDelta);
 
         // Map PID output to PWM range and apply
         // The PID output is interpreted as PWM magnitude; tune kp/ki/kd accordingly.
-        applyReactionControl(controlX, controlY);
+        // applyReactionControl(controlX, controlY);
 
         // debug print occasionally
         static unsigned long lastDebugMillis = 0;
         if (millis() - lastDebugMillis > 1000)
         {
             lastDebugMillis = millis();
-            Serial.print("Rates (deg/s) X:");
-            Serial.print(filteredRateX);
-            Serial.print(" Y:");
-            Serial.print(filteredRateY);
-            Serial.print(" -> PWM X:");
-            Serial.print((int)fabs(controlX));
-            Serial.print(" Y:");
-            Serial.println((int)fabs(controlY));
+            // Serial.print("Rates (deg/s) X:");
+            // Serial.print(filteredRateX);
+            // Serial.print(" Y:");
+            // Serial.print(filteredRateY);
+            // Serial.print(" -> PWM X:");
+            // Serial.print((int)fabs(controlX));
+            // Serial.print(" Y:");
+            // Serial.println((int)fabs(controlY));
         }
     }
 

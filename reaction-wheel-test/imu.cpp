@@ -16,7 +16,7 @@ IMU::IMU() {}
 
 void IMU::begin()
 {
-    Serial.println("Starting IMU... ");
+    // Serial.println("Starting IMU... ");
     Wire1.begin();
     delay(50);
     while (!bno08x.begin_I2C(BNO08x_I2CADDR_DEFAULT, &Wire1))
@@ -28,7 +28,7 @@ void IMU::begin()
 
     setReports();
 
-    Serial.println("Done");
+    // Serial.println("Done");
 }
 
 void IMU::setReports()
@@ -77,10 +77,10 @@ void IMU::getSensorData()
             sensorValue.un.gameRotationVector.k);
         break;
     case SH2_GYROSCOPE_CALIBRATED:
-        // Populate angular velocity (degrees/sec)
-        lastAngularVelocity.x = -sensorValue.un.gyroscope.x;
-        lastAngularVelocity.y = sensorValue.un.gyroscope.y;
-        lastAngularVelocity.z = sensorValue.un.gyroscope.z;
+        // Populate angular velocity (deg/sec)
+        lastAngularVelocity.x = -sensorValue.un.gyroscope.x * RAD_TO_DEG;
+        lastAngularVelocity.y = sensorValue.un.gyroscope.y * RAD_TO_DEG;
+        lastAngularVelocity.z = sensorValue.un.gyroscope.z * RAD_TO_DEG;
         break;
     }
 }
@@ -102,7 +102,7 @@ Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk)
     // roll (x-axis rotation)
     double sinr_cosp = 2 * (qr * qi + qj * qk);
     double cosr_cosp = 1 - 2 * (qi * qi + qj * qj);
-    tempVector.x = std::atan2(sinr_cosp, cosr_cosp);
+    tempVector.x = -std::atan2(sinr_cosp, cosr_cosp);
 
     // pitch (y-axis rotation)
     double sinp = std::sqrt(1 + 2 * (qr * qj - qi * qk));
