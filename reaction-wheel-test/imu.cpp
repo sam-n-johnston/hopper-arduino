@@ -37,10 +37,6 @@ void IMU::setReports()
     {
         Serial.println("Could not enable rotation vector");
     }
-    if (!bno08x.enableReport(SH2_GYROSCOPE_CALIBRATED))
-    {
-        Serial.println("Could not enable gyroscope");
-    }
 }
 
 void IMU::getSensorData()
@@ -76,12 +72,6 @@ void IMU::getSensorData()
             sensorValue.un.gameRotationVector.j,
             sensorValue.un.gameRotationVector.k);
         break;
-    case SH2_GYROSCOPE_CALIBRATED:
-        // Populate angular velocity (deg/sec)
-        lastAngularVelocity.x = -sensorValue.un.gyroscope.x * RAD_TO_DEG;
-        lastAngularVelocity.y = sensorValue.un.gyroscope.y * RAD_TO_DEG;
-        lastAngularVelocity.z = sensorValue.un.gyroscope.z * RAD_TO_DEG;
-        break;
     }
 }
 
@@ -102,7 +92,7 @@ Vector IMU::quaternionToEuler(float qr, float qi, float qj, float qk)
     // roll (x-axis rotation)
     double sinr_cosp = 2 * (qr * qi + qj * qk);
     double cosr_cosp = 1 - 2 * (qi * qi + qj * qj);
-    tempVector.x = -std::atan2(sinr_cosp, cosr_cosp);
+    tempVector.x = std::atan2(sinr_cosp, cosr_cosp);
 
     // pitch (y-axis rotation)
     double sinp = std::sqrt(1 + 2 * (qr * qj - qi * qk));

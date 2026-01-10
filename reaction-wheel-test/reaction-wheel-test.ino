@@ -26,53 +26,24 @@ float pidY_kp = 3.0f, pidY_ki = 0.0f, pidY_kd = 0.02f;
 float pidX_integral = 0.0f, pidX_prevError = 0.0f;
 float pidY_integral = 0.0f, pidY_prevError = 0.0f;
 
-// Simple low-pass for gyro rates
-const float ANGLE_FILTER_G = 0.999f; // gyro portion of complementary filter [0...1]
-Vector gyroAngle;
-Vector filteredAngle;
-
 int maxTorquePWM = 220; // cap torque PWM
 
 bool reactionControlEnabled = true;
 
 void logVector(Vector vec)
 {
-    Serial.print(vec.x);
-    Serial.print(",");
+    // Serial.print(vec.x);
+    // Serial.print(",");
     // Serial.print(vec.y);
     // Serial.print(",");
     // Serial.print(vec.z);
-    // Serial.print(",");
 }
 
-// Read IMU and update filtered angular rates (rad/s)
-// TODO - Need to merge acceleration reading 
-// with gyro readings and test them with video
 void readIMUrates()
 {
     customImu.getSensorData();
-    Vector angularVelocity = customImu.getAngularVelocity(); // deg/s
-    // logVector(angularVelocity);
-
-    Vector gyroAngleDelta;
-    gyroAngleDelta.x = angularVelocity.x * timeDelta; 
-    gyroAngleDelta.y = angularVelocity.y * timeDelta;
-    gyroAngleDelta.z = angularVelocity.z * timeDelta;
-    // logVector(gyroAngleDelta);
-
-    gyroAngle.x += gyroAngleDelta.x;
-    gyroAngle.y += gyroAngleDelta.y;
-    gyroAngle.z += gyroAngleDelta.z;
-    logVector(gyroAngle);
-
     bodyOrientation = customImu.getOrientation();
     logVector(bodyOrientation);
-
-    filteredAngle.x = ANGLE_FILTER_G * (filteredAngle.x +  gyroAngleDelta.x) + (1.0f - ANGLE_FILTER_G) * bodyOrientation.x;
-    filteredAngle.y = ANGLE_FILTER_G * (filteredAngle.y +  gyroAngleDelta.y) + (1.0f - ANGLE_FILTER_G) * bodyOrientation.y;
-    filteredAngle.z = ANGLE_FILTER_G * (filteredAngle.z +  gyroAngleDelta.z) + (1.0f - ANGLE_FILTER_G) * bodyOrientation.z;
-
-    logVector(filteredAngle);
     Serial.println();
 }
 
@@ -193,14 +164,6 @@ void setup()
     Serial.begin(115200);
     // Serial.write("Starting...");
 
-    gyroAngle.x = 0 ;
-    gyroAngle.y = 0 ;
-    gyroAngle.z = 0 ;
-    filteredAngle.x = 0 ;
-    filteredAngle.y = 0 ;
-    filteredAngle.z = 0 ;
-    delay(50);
-
     setupMotors();
     customImu.begin();
 
@@ -269,9 +232,9 @@ void loop()
         }
 
         // Compute PID outputs (setpoint = 0 deg/s)
-        float controlX = pidUpdate(0.0f, filteredAngle.x, pidX_integral, pidX_prevError,
+        float controlX = pidUpdate(0.0f, bodyOrientation.x, pidX_integral, pidX_prevError,
                                    pidX_kp, pidX_ki, pidX_kd, timeDelta);
-        float controlY = pidUpdate(0.0f, filteredAngle.y, pidY_integral, pidY_prevError,
+        float controlY = pidUpdate(0.0f, bodyOrientation.y, pidY_integral, pidY_prevError,
                                    pidY_kp, pidY_ki, pidY_kd, timeDelta);
 
         // Map PID output to PWM range and apply
