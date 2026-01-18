@@ -20,8 +20,8 @@ const unsigned long SERVO_UPDATE_INTERVAL_US = 200000; // 5 Hz servo update
 unsigned long lastServoMicros = 0;
 
 // PID gains (initial values, tune on hardware)
-float pidX_kp = 3.0f, pidX_ki = 0.0f, pidX_kd = 0.02f;
-float pidY_kp = 3.0f, pidY_ki = 0.0f, pidY_kd = 0.02f;
+float pidX_kp = 100.0f, pidX_ki = 0.0f, pidX_kd = 0.02f;
+float pidY_kp = 100.0f, pidY_ki = 0.0f, pidY_kd = 0.02f;
 
 float pidX_integral = 0.0f, pidX_prevError = 0.0f;
 float pidY_integral = 0.0f, pidY_prevError = 0.0f;
@@ -29,6 +29,12 @@ float pidY_integral = 0.0f, pidY_prevError = 0.0f;
 int maxTorquePWM = 220; // cap torque PWM
 
 bool reactionControlEnabled = true;
+
+// --- Dynamic target angle feature ---
+bool enableDynamicTargetAngle = false;  // Feature flag to enable/disable dynamic target angle
+const float ANGLE_FIXRATE = 1.0f;      // Rate of change for target angle [deg/s]
+float targetAngleX = 0.0f;
+float targetAngleY = 0.0f;
 
 void logVector(Vector vec)
 {
@@ -44,7 +50,7 @@ void readIMUrates()
     customImu.getSensorData();
     bodyOrientation = customImu.getOrientation();
     logVector(bodyOrientation);
-    Serial.println();
+    // Serial.println();
 }
 
 // Simple PID that returns a signed control value (mapped to PWM units)
@@ -62,6 +68,29 @@ float pidUpdate(float setpoint, float measurement, float &integral, float &prevE
     prevError = error;
     float out = kp * error + ki * integral + kd * derivative;
     return out;
+}
+
+// Update target angle based on current measured angle
+void updateTargetAngles(float measuredX, float measuredY, float dt)
+{
+    if (!enableDynamicTargetAngle) {
+        targetAngleX = 0.0f;
+        targetAngleY = 0.0f;
+        return;
+    }
+
+    // Adjust target angle towards zero based on ANGLE_FIXRATE
+    if (measuredX < targetAngleX) {
+        targetAngleX += ANGLE_FIXRATE * dt;
+    } else {
+        targetAngleX -= ANGLE_FIXRATE * dt;
+    }
+
+    if (measuredY < targetAngleY) {
+        targetAngleY += ANGLE_FIXRATE * dt;
+    } else {
+        targetAngleY -= ANGLE_FIXRATE * dt;
+    }
 }
 
 // Apply signed control value to motors (convert to PWM + direction)
@@ -222,8 +251,11 @@ void loop()
         // Read IMU and update filtered rates
         readIMUrates();
 
+        // Update target angles (or set to 0.0f if feature is disabled)
+        updateTargetAngles(bodyOrientation.x, bodyOrientation.y, timeDelta);
+
         // Safety: if orientation is extreme, disable control
-        if (fabs(bodyOrientation.x) > 60.0f || fabs(bodyOrientation.y) > 60.0f)
+        if (fabs(bodyOrientation.x) > 35.0f || fabs(bodyOrientation.y) > 35.0f)
         {
             reactionControlEnabled = false;
             Serial.println("Safety: orientation exceeded limit, disabling reaction control");
@@ -231,15 +263,15 @@ void loop()
             setMotorTorqueY(0, false);
         }
 
-        // Compute PID outputs (setpoint = 0 deg/s)
-        float controlX = pidUpdate(0.0f, bodyOrientation.x, pidX_integral, pidX_prevError,
+        // Compute PID outputs (setpoint = targetAngle or 0.0f depending on feature flag)
+        float controlX = pidUpdate(targetAngleX, bodyOrientation.x, pidX_integral, pidX_prevError,
                                    pidX_kp, pidX_ki, pidX_kd, timeDelta);
-        float controlY = pidUpdate(0.0f, bodyOrientation.y, pidY_integral, pidY_prevError,
+        float controlY = pidUpdate(targetAngleY, bodyOrientation.y, pidY_integral, pidY_prevError,
                                    pidY_kp, pidY_ki, pidY_kd, timeDelta);
 
         // Map PID output to PWM range and apply
         // The PID output is interpreted as PWM magnitude; tune kp/ki/kd accordingly.
-        // applyReactionControl(controlX, controlY);
+        applyReactionControl(controlX, controlY);
 
         // debug print occasionally
         static unsigned long lastDebugMillis = 0;
